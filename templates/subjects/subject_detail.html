@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ subject.name }}
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    {{ subject.name }}
+</h1>
+
+<p>
+    {{ subject.description }}
+</p>
+
+<p>
+    Created:
+    {{ subject.created_at }}
+</p>
+
+<p>
+    Updated:
+    {{ subject.updated_at }}
+</p>
+
+<hr>
+
+<a
+    href="{% url 'subject_update' subject.pk %}"
+>
+    Edit
+</a>
+
+<a
+    href="{% url 'subject_delete' subject.pk %}"
+>
+    Delete
+</a>
+
+<a
+    href="{% url 'subject_list' %}"
+>
+    Back to Subjects
+</a>
+
+{% endblock %}

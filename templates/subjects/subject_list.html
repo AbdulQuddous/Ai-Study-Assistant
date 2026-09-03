@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Subjects
+{% endblock %}
+
+{% block content %}
+
+<h1>My Subjects</h1>
+
+<a href="{% url 'subject_create' %}">
+    Create Subject
+</a>
+
+<hr>
+
+{% if subjects %}
+
+    {% for subject in subjects %}
+
+        <article>
+
+            <h2>
+                {{ subject.name }}
+            </h2>
+
+            <p>
+                {{ subject.description }}
+            </p>
+
+            <a
+                href="{% url 'subject_detail' subject.pk %}"
+            >
+                View
+            </a>
+
+            <a
+                href="{% url 'subject_update' subject.pk %}"
+            >
+                Edit
+            </a>
+
+            <a
+                href="{% url 'subject_delete' subject.pk %}"
+            >
+                Delete
+            </a>
+
+        </article>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>
+        You don't have any subjects yet.
+    </p>
+
+{% endif %}
+
+{% endblock %}

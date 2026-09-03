@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    AI Study Assistant
+</h1>
+
+<h2>
+    Welcome, {{ user.username }}!
+</h2>
+
+<hr>
+
+<h3>
+    Study Tools
+</h3>
+
+<ul>
+
+    <li>
+        <a href="{% url 'subject_list' %}">
+            My Subjects
+        </a>
+    </li>
+
+    <li>
+        My Notes
+    </li>
+
+    <li>
+        My Documents
+    </li>
+
+    <li>
+        AI Assistant
+    </li>
+
+    <li>
+        AI Quizzes
+    </li>
+
+</ul>
+
+{% endblock %}

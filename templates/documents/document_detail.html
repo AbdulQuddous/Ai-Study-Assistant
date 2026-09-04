@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1>{{ document.title }}</h1>
+
+            <p class="text-muted mb-0">
+                Subject: {{ document.subject.name }}
+            </p>
+        </div>
+
+        <div>
+
+            <a
+                href="{{ document.file.url }}"
+                target="_blank"
+                class="btn btn-primary"
+            >
+                Open PDF
+            </a>
+
+            <a
+                href="{% url 'document_delete' document.pk %}"
+                class="btn btn-danger"
+            >
+                Delete
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <strong>Document Information</strong>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+                <strong>Title:</strong>
+                {{ document.title }}
+            </p>
+
+            <p>
+                <strong>Subject:</strong>
+                {{ document.subject.name }}
+            </p>
+
+            <p>
+                <strong>Uploaded:</strong>
+                {{ document.created_at|date:"M d, Y H:i" }}
+            </p>
+
+            <p>
+                <strong>Words extracted:</strong>
+                {{ document.extracted_text|wordcount }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-header">
+            <strong>Extracted Text</strong>
+        </div>
+
+        <div class="card-body">
+
+            {% if document.extracted_text %}
+
+                <div>
+                    {{ document.extracted_text|linebreaks }}
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
+                    No text could be extracted from this PDF.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="mt-4">
+
+        <a
+            href="{% url 'document_list' %}"
+            class="btn btn-secondary"
+        >
+            ← Back to Documents
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

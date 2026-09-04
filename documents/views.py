@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-
+from .services.processor import process_document
 from .forms import DocumentForm
 from .models import Document
 from .services.pdf_extractor import extract_text_from_pdf
@@ -40,6 +40,8 @@ def document_upload(request):
             )
 
             document.save()
+
+            process_document(document)
 
             return redirect("document_list")
 

@@ -1,11 +1,10 @@
 from django.contrib import admin
 
-from .models import Document
+from .models import Document, DocumentChunk
 
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-
     list_display = (
         "title",
         "subject",
@@ -22,5 +21,24 @@ class DocumentAdmin(admin.ModelAdmin):
 
     list_filter = (
         "subject",
+        "created_at",
+    )
+
+
+@admin.register(DocumentChunk)
+class DocumentChunkAdmin(admin.ModelAdmin):
+    list_display = (
+        "document",
+        "chunk_index",
+        "created_at",
+    )
+
+    search_fields = (
+        "content",
+        "document__title",
+    )
+
+    list_filter = (
+        "document",
         "created_at",
     )

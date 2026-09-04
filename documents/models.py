@@ -3,6 +3,8 @@ from django.db import models
 
 from subjects.models import Subject
 
+from .validators import validate_pdf
+
 
 class Document(models.Model):
     user = models.ForeignKey(
@@ -20,7 +22,8 @@ class Document(models.Model):
     title = models.CharField(max_length=200)
 
     file = models.FileField(
-        upload_to="documents/"
+        upload_to="documents/",
+        validators=[validate_pdf],
     )
 
     extracted_text = models.TextField(

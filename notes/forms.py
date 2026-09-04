@@ -31,3 +31,13 @@ class NoteForm(forms.ModelForm):
                 }
             ),
         }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user is not None:
+            self.fields["subject"].queryset = (
+                self.fields["subject"]
+                .queryset
+                .filter(user=user)
+            )

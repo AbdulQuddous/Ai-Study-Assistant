@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="mb-3">
+
+        <a
+            href="{% url 'note_list' %}"
+            class="btn btn-secondary"
+        >
+            ← Back to Notes
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <h1 class="card-title">
+                {{ note.title }}
+            </h1>
+
+            <p class="text-muted">
+                Subject: {{ note.subject.name }}
+            </p>
+
+            <hr>
+
+            <div class="note-content">
+
+                {{ note.content|linebreaks }}
+
+            </div>
+
+            <hr>
+
+            <div class="mt-3">
+
+                <a
+                    href="{% url 'note_update' note.pk %}"
+                    class="btn btn-primary"
+                >
+                    Edit Note
+                </a>
+
+                <a
+                    href="{% url 'note_delete' note.pk %}"
+                    class="btn btn-danger"
+                >
+                    Delete Note
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer text-muted">
+
+            Created:
+            {{ note.created_at|date:"M d, Y H:i" }}
+
+            <br>
+
+            Last updated:
+            {{ note.updated_at|date:"M d, Y H:i" }}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

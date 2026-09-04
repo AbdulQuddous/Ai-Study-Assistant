@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h1>My Notes</h1>
+
+        <a
+            href="{% url 'note_create' %}"
+            class="btn btn-primary"
+        >
+            + Create Note
+        </a>
+
+    </div>
+
+
+    <!-- Search -->
+
+    <form method="get" class="mb-4">
+
+        <div class="input-group">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ search_query }}"
+                class="form-control"
+                placeholder="Search notes..."
+            >
+
+            <button
+                type="submit"
+                class="btn btn-outline-primary"
+            >
+                Search
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- Notes -->
+
+    {% if page_obj %}
+
+        <div class="row">
+
+            {% for note in page_obj %}
+
+                <div class="col-md-6 mb-4">
+
+                    <div class="card h-100">
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                {{ note.title }}
+                            </h5>
+
+                            <p class="text-muted">
+                                Subject:
+                                {{ note.subject.name }}
+                            </p>
+
+                            <p class="card-text">
+                                {{ note.content|truncatewords:30 }}
+                            </p>
+
+                            <a
+                                href="{% url 'note_detail' note.pk %}"
+                                class="btn btn-outline-primary"
+                            >
+                                Read Note
+                            </a>
+
+                        </div>
+
+                        <div class="card-footer text-muted">
+
+                            Created:
+                            {{ note.created_at|date:"M d, Y" }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <div class="col-12">
+
+                    <div class="alert alert-info">
+
+                        {% if search_query %}
+
+                            No notes found for
+                            "<strong>{{ search_query }}</strong>".
+
+                        {% else %}
+
+                            You don't have any notes yet.
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- Pagination -->
+
+        {% if page_obj.has_other_pages %}
+
+            <nav aria-label="Notes pagination">
+
+                <ul class="pagination justify-content-center">
+
+
+                    <!-- Previous -->
+
+                    {% if page_obj.has_previous %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+                            >
+                                Previous
+                            </a>
+
+                        </li>
+
+                    {% else %}
+
+                        <li class="page-item disabled">
+
+                            <span class="page-link">
+                                Previous
+                            </span>
+
+                        </li>
+
+                    {% endif %}
+
+
+                    <!-- Page Numbers -->
+
+                    {% for num in page_obj.paginator.page_range %}
+
+                        {% if page_obj.number == num %}
+
+                            <li class="page-item active">
+
+                                <span class="page-link">
+                                    {{ num }}
+                                </span>
+
+                            </li>
+
+                        {% else %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?page={{ num }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+                                >
+                                    {{ num }}
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                    <!-- Next -->
+
+                    {% if page_obj.has_next %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+                            >
+                                Next
+                            </a>
+
+                        </li>
+
+                    {% else %}
+
+                        <li class="page-item disabled">
+
+                            <span class="page-link">
+                                Next
+                            </span>
+
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </nav>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

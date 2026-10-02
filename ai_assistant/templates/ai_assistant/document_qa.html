@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Ask AI - {{ document.title }}{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <a href="{% url 'document_detail' document.pk %}">
+            ← Back to Document
+        </a>
+    </div>
+
+    <h1>Ask AI</h1>
+
+    <p class="text-muted">
+        Ask a question about:
+        <strong>{{ document.title }}</strong>
+    </p>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <form method="post">
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Ask AI
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    {% if answer %}
+        <div class="card">
+            <div class="card-header">
+                <strong>AI Answer</strong>
+            </div>
+
+            <div class="card-body">
+                {{ answer|linebreaks }}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

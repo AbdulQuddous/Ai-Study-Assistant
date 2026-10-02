@@ -31,6 +31,10 @@ urlpatterns = [
         "documents/",
         include("documents.urls")
     ),
+    path(
+        "ai/",
+        include("ai_assistant.urls"),
+    ),
 ]
 
 

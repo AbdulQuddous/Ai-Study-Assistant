@@ -23,6 +23,26 @@
             >
                 Open PDF
             </a>
+            <a
+                href="{% url 'document_qa' document.pk %}"
+                class="btn btn-primary"
+            >
+                Ask AI
+            </a>
+            <form
+                method="post"
+                action="{% url 'document_summarize' document.pk %}"
+                class="d-inline"
+            >
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-success"
+                >
+                    ✨ Generate AI Summary
+                </button>
+            </form>
 
             <a
                 href="{% url 'document_delete' document.pk %}"
@@ -30,6 +50,7 @@
             >
                 Delete
             </a>
+
 
         </div>
 
@@ -59,6 +80,32 @@
                 {{ document.created_at|date:"M d, Y H:i" }}
             </p>
 
+            {% if summary_error %}
+
+                <div class="alert alert-danger">
+                    {{ summary_error }}
+                </div>
+
+            {% endif %}
+
+
+            {% if document.ai_summary %}
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+                        <strong>✨ AI Summary</strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        {{ document.ai_summary|linebreaks }}
+
+                    </div>
+
+                </div>
+
+            {% endif %}
             <p>
                 <strong>Words extracted:</strong>
                 {{ document.extracted_text|wordcount }}

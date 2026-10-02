@@ -30,6 +30,10 @@ class Document(models.Model):
         blank=True
     )
 
+    ai_summary = models.TextField(
+        blank=True
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )

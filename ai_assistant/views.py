@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from documents.models import Document
 
 from .forms import QAForm
+from .models import ChatMessage
 from .services.qa import QAService
 
 
@@ -38,13 +39,30 @@ def document_qa(request, document_id):
                         study_material=document.extracted_text,
                     )
 
+                    ChatMessage.objects.create(
+                        user=request.user,
+                        document=document,
+                        question=question,
+                        answer=answer,
+                    )
+
                 except Exception:
                     error = (
                         "Unable to answer the question "
                         "right now. Please try again."
                     )
+
     else:
         form = QAForm()
+
+    chat_messages = (
+        ChatMessage.objects
+        .filter(
+            user=request.user,
+            document=document,
+        )
+        .order_by("-created_at")
+    )
 
     return render(
         request,
@@ -54,5 +72,6 @@ def document_qa(request, document_id):
             "form": form,
             "answer": answer,
             "error": error,
+            "chat_messages": chat_messages,
         },
     )

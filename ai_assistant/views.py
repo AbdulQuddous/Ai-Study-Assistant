@@ -5,7 +5,7 @@ from documents.models import Document
 
 from .forms import QAForm
 from .models import ChatMessage
-from .services.qa import QAService
+from .services.rag import RAGService
 
 
 @login_required
@@ -25,32 +25,26 @@ def document_qa(request, document_id):
         if form.is_valid():
             question = form.cleaned_data["question"]
 
-            if not document.extracted_text.strip():
-                error = (
-                    "This document does not contain "
-                    "extractable text."
+            rag_service = RAGService()
+
+            try:
+                answer = rag_service.answer(
+                    document=document,
+                    question=question,
                 )
-            else:
-                qa_service = QAService()
 
-                try:
-                    answer = qa_service.answer(
-                        question=question,
-                        study_material=document.extracted_text,
-                    )
+                ChatMessage.objects.create(
+                    user=request.user,
+                    document=document,
+                    question=question,
+                    answer=answer,
+                )
 
-                    ChatMessage.objects.create(
-                        user=request.user,
-                        document=document,
-                        question=question,
-                        answer=answer,
-                    )
-
-                except Exception:
-                    error = (
-                        "Unable to answer the question "
-                        "right now. Please try again."
-                    )
+            except Exception:
+                error = (
+                    "Unable to answer the question right now. "
+                    "Please try again."
+                )
 
     else:
         form = QAForm()

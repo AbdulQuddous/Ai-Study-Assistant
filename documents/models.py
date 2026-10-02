@@ -52,14 +52,15 @@ class DocumentChunk(models.Model):
         on_delete=models.CASCADE,
         related_name="chunks",
     )
-
     chunk_index = models.PositiveIntegerField()
-
     content = models.TextField()
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
+    embedding = models.JSONField(
+        null=True,
+        blank=True,
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.document.title} - Chunk {self.chunk_index}"

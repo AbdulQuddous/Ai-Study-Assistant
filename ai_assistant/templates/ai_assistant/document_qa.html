@@ -1,11 +1,8 @@
 {% extends "base.html" %}
-
 {% block title %}Ask AI - {{ document.title }}{% endblock %}
 
 {% block content %}
-
 <div class="container mt-4">
-
     <div class="mb-4">
         <a href="{% url 'document_detail' document.pk %}">
             ← Back to Document
@@ -13,36 +10,24 @@
     </div>
 
     <h1>Ask AI</h1>
-
     <p class="text-muted">
-        Ask questions about:
-        <strong>{{ document.title }}</strong>
+        Ask questions about: <strong>{{ document.title }}</strong>
     </p>
 
     <!-- Question Form -->
-
     <div class="card mb-4">
         <div class="card-body">
-
             <form method="post">
                 {% csrf_token %}
-
                 {{ form.as_p }}
-
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                >
+                <button type="submit" class="btn btn-primary">
                     Ask AI
                 </button>
-
             </form>
-
         </div>
     </div>
 
     <!-- Error -->
-
     {% if error %}
         <div class="alert alert-danger">
             {{ error }}
@@ -50,23 +35,17 @@
     {% endif %}
 
     <!-- Chat History -->
-
     {% if chat_messages %}
-
         <h3 class="mb-3">
             Conversation History
         </h3>
 
         {% for message in chat_messages %}
-
             <div class="card mb-3">
-
                 <div class="card-body">
-
                     <h6 class="text-primary">
                         You
                     </h6>
-
                     <p>
                         {{ message.question|linebreaks }}
                     </p>
@@ -76,30 +55,40 @@
                     <h6 class="text-success">
                         AI
                     </h6>
-
                     <div>
                         {{ message.answer|linebreaks }}
                     </div>
 
+                    {% if message.sources %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <strong>Sources used</strong>
+                            </div>
+                            <div class="card-body">
+                                {% for source in message.sources %}
+                                    <div class="mb-2">
+                                        <strong>
+                                            Chunk {{ source.chunk_index }}
+                                        </strong>
+                                        <span class="text-muted">
+                                            — relevance: {{ source.score|floatformat:3 }}
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <small class="text-muted">
                         {{ message.created_at|date:"M d, Y H:i" }}
                     </small>
-
                 </div>
-
             </div>
-
         {% endfor %}
-
     {% else %}
-
         <div class="alert alert-info">
-            No questions asked yet. Ask your first question
-            about this document.
+            No questions asked yet. Ask your first question about this document.
         </div>
-
     {% endif %}
-
 </div>
-
 {% endblock %}

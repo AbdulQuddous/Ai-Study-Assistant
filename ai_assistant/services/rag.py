@@ -13,11 +13,10 @@ class RAGService:
         document,
         question,
         top_k=5,
+        similarity_threshold=0.25,
     ):
         if not question or not question.strip():
-            raise ValueError(
-                "Question cannot be empty."
-            )
+            raise ValueError("Question cannot be empty.")
 
         if not document.extracted_text.strip():
             raise ValueError(
@@ -28,13 +27,17 @@ class RAGService:
             document=document,
             query=question,
             top_k=top_k,
+            similarity_threshold=similarity_threshold,
         )
 
         if not retrieved_chunks:
-            return (
-                "I could not find relevant information "
-                "in the provided study material."
-            )
+            return {
+                "answer": (
+                    "I could not find relevant information "
+                    "in the provided study material."
+                ),
+                "sources": [],
+            }
 
         prompt = build_rag_prompt(
             question=question,
@@ -43,4 +46,16 @@ class RAGService:
 
         answer = self.llm.generate(prompt)
 
-        return answer
+        sources = [
+            {
+                "chunk_id": item["chunk"].id,
+                "chunk_index": item["chunk"].chunk_index,
+                "score": item["score"],
+            }
+            for item in retrieved_chunks
+        ]
+
+        return {
+            "answer": answer,
+            "sources": sources,
+        }

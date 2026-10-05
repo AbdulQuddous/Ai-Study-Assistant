@@ -17,6 +17,7 @@ def document_qa(request, document_id):
     )
 
     answer = None
+    sources = []
     error = None
 
     if request.method == "POST":
@@ -28,24 +29,33 @@ def document_qa(request, document_id):
             rag_service = RAGService()
 
             try:
-                answer = rag_service.answer(
+                result = rag_service.answer(
                     document=document,
                     question=question,
                 )
+
+                answer = result["answer"]
+                sources = result.get("sources", [])
 
                 ChatMessage.objects.create(
                     user=request.user,
                     document=document,
                     question=question,
                     answer=answer,
+                    sources=sources,
                 )
 
-            except Exception:
+            except Exception as e:
+                print(
+                    f"[VIEW] RAG error: "
+                    f"{type(e).__name__}: {e}"
+                )
                 error = (
                     "Unable to answer the question right now. "
                     "Please try again."
                 )
-
+        else:
+            error = "Please enter a valid question."
     else:
         form = QAForm()
 
@@ -66,6 +76,7 @@ def document_qa(request, document_id):
             "form": form,
             "answer": answer,
             "error": error,
+            "sources": sources,
             "chat_messages": chat_messages,
         },
     )

@@ -21,6 +21,11 @@ class ChatMessage(models.Model):
 
     answer = models.TextField()
 
+    sources = models.JSONField(
+        default=list,
+        blank=True,
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )

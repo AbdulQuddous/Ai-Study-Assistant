@@ -25,8 +25,8 @@ def process_document(document):
 
     chunks = chunk_text(
         cleaned_text,
-        chunk_size=1000,
-        overlap=200,
+        chunk_size=500,
+        overlap=100,
     )
 
     if not chunks:

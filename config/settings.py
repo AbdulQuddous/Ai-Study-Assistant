@@ -159,3 +159,13 @@ EMBEDDING_MODEL = os.getenv(
     "EMBEDDING_MODEL",
     "all-MiniLM-L6-v2",
 )
+RAG_TOP_K = int(
+    os.getenv("RAG_TOP_K", "5")
+)
+
+RAG_SIMILARITY_THRESHOLD = float(
+    os.getenv(
+        "RAG_SIMILARITY_THRESHOLD",
+        "0.25",
+    )
+)

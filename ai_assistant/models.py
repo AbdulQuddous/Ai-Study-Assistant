@@ -10,15 +10,12 @@ class ChatMessage(models.Model):
         on_delete=models.CASCADE,
         related_name="chat_messages",
     )
-
     document = models.ForeignKey(
         Document,
         on_delete=models.CASCADE,
         related_name="chat_messages",
     )
-
     question = models.TextField()
-
     answer = models.TextField()
 
     sources = models.JSONField(
@@ -26,9 +23,7 @@ class ChatMessage(models.Model):
         blank=True,
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["created_at"]

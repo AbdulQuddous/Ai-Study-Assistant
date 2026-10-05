@@ -60,19 +60,32 @@
                     </div>
 
                     {% if message.sources %}
-                        <div class="card mb-4">
+                        <div class="card mt-3 mb-3">
                             <div class="card-header">
                                 <strong>Sources used</strong>
                             </div>
                             <div class="card-body">
                                 {% for source in message.sources %}
-                                    <div class="mb-2">
-                                        <strong>
-                                            Chunk {{ source.chunk_index }}
-                                        </strong>
-                                        <span class="text-muted">
-                                            — relevance: {{ source.score|floatformat:3 }}
-                                        </span>
+                                    <div class="border rounded p-3 mb-2">
+                                        <div class="mb-2">
+                                            <strong>
+                                                Chunk {{ source.chunk_index }}
+                                            </strong>
+                                            <span class="text-muted">
+                                                — relevance: {{ source.score|floatformat:3 }}
+                                            </span>
+                                        </div>
+
+                                        {% if source.content %}
+                                            <details>
+                                                <summary class="text-primary" style="cursor: pointer;">
+                                                    View source content
+                                                </summary>
+                                                <div class="mt-2 small text-muted">
+                                                    {{ source.content|linebreaks }}
+                                                </div>
+                                            </details>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
                             </div>

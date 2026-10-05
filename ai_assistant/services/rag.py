@@ -51,6 +51,7 @@ class RAGService:
                 "chunk_id": item["chunk"].id,
                 "chunk_index": item["chunk"].chunk_index,
                 "score": item["score"],
+                "content": item["chunk"].content,
             }
             for item in retrieved_chunks
         ]

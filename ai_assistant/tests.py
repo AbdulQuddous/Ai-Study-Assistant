@@ -223,3 +223,98 @@ class RAGServiceConfigTests(TestCase):
         self.assertIn("chunk_index", first)
         self.assertIn("score", first)
         self.assertIn("content", first)
+
+        
+        # ------------------------------------------------------------------
+    # 29.19 — Minimum confidence gate
+    # ------------------------------------------------------------------
+
+    @override_settings(RAG_MIN_CONFIDENCE=0.80)
+    @patch("ai_assistant.services.rag.DocumentRetriever.retrieve")
+    @patch("ai_assistant.services.rag.LLMService.generate")
+    def test_rag_rejects_low_confidence_results(
+        self, mock_llm, mock_retrieve
+    ):
+        # Best score 0.65 < 0.80 → reject
+        mock_retrieve.return_value = [
+            {
+                "chunk": type(
+                    "FakeChunk",
+                    (),
+                    {"id": 1, "chunk_index": 0, "content": "x"},
+                )(),
+                "score": 0.65,
+            },
+        ]
+
+        result = RAGService().answer(
+            document=self.document,
+            question="Something unrelated",
+        )
+
+        self.assertIn("sufficiently relevant", result["answer"])
+        self.assertEqual(result["sources"], [])
+        mock_llm.assert_not_called()
+    
+    @override_settings(RAG_MIN_CONFIDENCE=0.80)
+    @patch("ai_assistant.services.rag.DocumentRetriever.retrieve")
+    @patch("ai_assistant.services.rag.LLMService.generate")
+    def test_rag_accepts_high_confidence_results(
+        self, mock_llm, mock_retrieve
+    ):
+        mock_retrieve.return_value = [
+            {
+                "chunk": type(
+                    "FakeChunk",
+                    (),
+                    {"id": 1, "chunk_index": 0, "content": "x"},
+                )(),
+                "score": 0.90,
+            },
+        ]
+        mock_llm.return_value = "Django is a web framework."
+
+        result = RAGService().answer(
+            document=self.document,
+            question="What is Django?",
+        )
+
+        self.assertEqual(
+            result["answer"], "Django is a web framework."
+        )
+        self.assertEqual(len(result["sources"]), 1)
+        mock_llm.assert_called_once()
+
+    @override_settings(RAG_MIN_CONFIDENCE=0.35)
+    @patch("ai_assistant.services.rag.DocumentRetriever.retrieve")
+    @patch("ai_assistant.services.rag.LLMService.generate")
+    def test_min_confidence_boundary_at_threshold(
+        self, mock_llm, mock_retrieve
+    ):
+        # Score exactly equal to min_confidence → accept (>=, not >)
+        mock_retrieve.return_value = [
+            {
+                "chunk": type(
+                    "FakeChunk",
+                    (),
+                    {"id": 1, "chunk_index": 0, "content": "x"},
+                )(),
+                "score": 0.35,
+            },
+        ]
+        mock_llm.return_value = "answer"
+
+        result = RAGService().answer(
+            document=self.document,
+            question="test",
+        )
+
+        mock_llm.assert_called_once()
+
+    def test_rejects_invalid_min_confidence(self):
+        with self.assertRaises(ValueError):
+            RAGService().answer(
+                document=self.document,
+                question="test",
+                min_confidence=1.5,
+            )

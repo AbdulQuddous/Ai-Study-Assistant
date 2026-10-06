@@ -169,3 +169,9 @@ RAG_SIMILARITY_THRESHOLD = float(
         "0.25",
     )
 )
+RAG_MIN_CONFIDENCE = float(
+    os.getenv(
+        "RAG_MIN_CONFIDENCE",
+        "0.60",
+    )
+)

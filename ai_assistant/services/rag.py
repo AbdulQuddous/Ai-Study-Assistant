@@ -16,11 +16,10 @@ class RAGService:
         question,
         top_k=None,
         similarity_threshold=None,
+        min_confidence=None,
     ):
         if not question or not question.strip():
-            raise ValueError(
-                "Question cannot be empty."
-            )
+            raise ValueError("Question cannot be empty.")
 
         if not document.extracted_text.strip():
             raise ValueError(
@@ -31,18 +30,23 @@ class RAGService:
             top_k = settings.RAG_TOP_K
 
         if similarity_threshold is None:
-            similarity_threshold = (
-                settings.RAG_SIMILARITY_THRESHOLD
-            )
+            similarity_threshold = settings.RAG_SIMILARITY_THRESHOLD
 
+        if min_confidence is None:
+            min_confidence = settings.RAG_MIN_CONFIDENCE
+
+        # Validation
         if top_k <= 0:
-            raise ValueError(
-                "RAG_TOP_K must be greater than 0."
-            )
+            raise ValueError("RAG_TOP_K must be greater than 0.")
 
         if not 0 <= similarity_threshold <= 1:
             raise ValueError(
                 "RAG_SIMILARITY_THRESHOLD must be between 0 and 1."
+            )
+
+        if not 0 <= min_confidence <= 1:
+            raise ValueError(
+                "RAG_MIN_CONFIDENCE must be between 0 and 1."
             )
 
         retrieved_chunks = self.retriever.retrieve(
@@ -57,6 +61,22 @@ class RAGService:
                 "answer": (
                     "I could not find relevant information "
                     "in the provided study material."
+                ),
+                "sources": [],
+            }
+
+        # The retriever sorts results descending, so [0] is the best match.
+        best_score = retrieved_chunks[0]["score"]
+
+        if best_score < min_confidence:
+            print(
+                f"[RAG] Low confidence: best_score={best_score:.3f} "
+                f"< min_confidence={min_confidence:.3f}"
+            )
+            return {
+                "answer": (
+                    "I could not find sufficiently relevant "
+                    "information in the provided study material."
                 ),
                 "sources": [],
             }

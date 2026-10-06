@@ -2,7 +2,7 @@ from django.conf import settings
 
 from .embeddings import EmbeddingService
 from .similarity import cosine_similarity
-
+from .query_preprocessor import preprocess_query
 
 class DocumentRetriever:
     def __init__(self):
@@ -23,10 +23,7 @@ class DocumentRetriever:
                 settings.RAG_SIMILARITY_THRESHOLD
             )
 
-        if not query or not query.strip():
-            raise ValueError(
-                "Query cannot be empty."
-            )
+        query = preprocess_query(query)
 
         if top_k <= 0:
             raise ValueError(

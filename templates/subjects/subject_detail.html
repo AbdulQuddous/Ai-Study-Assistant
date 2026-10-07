@@ -27,19 +27,19 @@
 <hr>
 
 <a
-    href="{% url 'subject_update' subject.pk %}"
+    href="{% url 'subjects:subject_update' subject.pk %}"
 >
     Edit
 </a>
 
 <a
-    href="{% url 'subject_delete' subject.pk %}"
+    href="{% url 'subjects:subject_delete' subject.pk %}"
 >
     Delete
 </a>
 
 <a
-    href="{% url 'subject_list' %}"
+    href="{% url 'subjects:subject_list' %}"
 >
     Back to Subjects
 </a>

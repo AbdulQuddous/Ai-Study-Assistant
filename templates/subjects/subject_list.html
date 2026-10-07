@@ -8,7 +8,7 @@ My Subjects
 
 <h1>My Subjects</h1>
 
-<a href="{% url 'subject_create' %}">
+<a href="{% url 'subjects:subject_create' %}">
     Create Subject
 </a>
 
@@ -29,19 +29,19 @@ My Subjects
             </p>
 
             <a
-                href="{% url 'subject_detail' subject.pk %}"
+                href="{% url 'subjects:subject_detail' subject.pk %}"
             >
                 View
             </a>
 
             <a
-                href="{% url 'subject_update' subject.pk %}"
+                href="{% url 'subjects:subject_update' subject.pk %}"
             >
                 Edit
             </a>
 
             <a
-                href="{% url 'subject_delete' subject.pk %}"
+                href="{% url 'subjects:subject_delete' subject.pk %}"
             >
                 Delete
             </a>

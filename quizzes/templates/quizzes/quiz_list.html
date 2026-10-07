@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 mb-4">My Quizzes</h1>
+  {% if quizzes %}
+    <div class="row g-3">
+      {% for quiz in quizzes %}
+        <div class="col-md-6 col-lg-4">{% include "quizzes/partials/quiz_card.html" %}</div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">No quizzes yet. Open a document and click <strong>Generate Quiz</strong>.</div>
+  {% endif %}
+</div>
+{% endblock %}

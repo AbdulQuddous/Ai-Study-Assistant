@@ -23,25 +23,21 @@ Dashboard
 <ul>
 
     <li>
-        <a href="{% url 'subject_list' %}">
+        <a href="{% url 'subjects:subject_list' %}">
             My Subjects
         </a>
     </li>
 
     <li>
-        My Notes
+        <a href="{% url 'documents:document_list' %}">
+            My Documents
+        </a>
     </li>
 
     <li>
-        My Documents
-    </li>
-
-    <li>
-        AI Assistant
-    </li>
-
-    <li>
-        AI Quizzes
+        <a href="{% url 'quizzes:quiz_list' %}">
+            AI Quizzes
+        </a>
     </li>
 
 </ul>

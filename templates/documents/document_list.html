@@ -9,7 +9,7 @@
         <h1>My Documents</h1>
 
         <a
-            href="{% url 'document_upload' %}"
+            href="{% url 'documents:document_upload' %}"
             class="btn btn-primary"
         >
             + Upload PDF
@@ -46,7 +46,7 @@
                             </p>
 
                             <a
-                                href="{% url 'document_detail' document.pk %}"
+                                href="{% url 'documents:document_detail' document.pk %}"
                                 class="btn btn-primary"
                             >
                                 View
@@ -83,7 +83,7 @@
 
             You haven't uploaded any PDFs yet.
 
-            <a href="{% url 'document_upload' %}">
+            <a href="{% url 'documents:document_upload' %}">
                 Upload your first PDF.
             </a>
 

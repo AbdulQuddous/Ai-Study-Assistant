@@ -1,5 +1,5 @@
 from django.urls import path
-
+from quizzes import views as quiz_views
 from .views import (
     document_delete,
     document_detail,
@@ -7,7 +7,7 @@ from .views import (
     document_summarize,
     document_upload,
 )
-
+app_name = "documents" 
 
 urlpatterns = [
     path("", document_list, name="document_list"),
@@ -34,5 +34,10 @@ urlpatterns = [
         "<int:pk>/summarize/",
         document_summarize,
         name="document_summarize",
+    ),
+    path(
+        "<int:pk>/generate-quiz/",
+        quiz_views.quiz_generate,
+        name="document_generate_quiz",
     ),
 ]

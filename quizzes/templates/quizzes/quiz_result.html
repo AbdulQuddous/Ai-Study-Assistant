@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="alert {% if attempt.percentage >= 70 %}alert-success{% else %}alert-warning{% endif %} text-center">
+    <h1 class="display-6 mb-0">{{ attempt.score }}/{{ attempt.total_questions }}</h1>
+    <div>{{ attempt.percentage }}% — {{ quiz.title }}</div>
+  </div>
+  {% for item in review %}
+    <div class="card mb-3 border-{% if item.is_correct %}success{% else %}danger{% endif %}">
+      <div class="card-body">
+        <h5 class="card-title">{{ forloop.counter }}. {{ item.question.text }}
+          <span class="badge bg-{% if item.is_correct %}success{% else %}danger{% endif %}">
+            {% if item.is_correct %}Correct{% else %}Wrong{% endif %}</span></h5>
+        <ul class="list-group mb-2">
+          {% for c in item.choices %}
+            <li class="list-group-item {% if c.is_correct %}list-group-item-success{% elif c.is_chosen %}list-group-item-danger{% endif %}">
+              {{ c.text }}
+              {% if c.is_chosen %}<span class="badge bg-dark ms-2">Your answer</span>{% endif %}
+              {% if c.is_correct %}<span class="badge bg-success ms-2">Correct</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        {% if item.chosen_index == -1 %}<p class="text-muted small mb-1">Not answered.</p>{% endif %}
+        {% if item.question.explanation %}<p class="small mb-0"><strong>Why:</strong> {{ item.question.explanation }}</p>{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+  <a href="{% url 'quizzes:quiz_detail' quiz.pk %}" class="btn btn-outline-secondary">Back to quiz</a>
+  <a href="{% url 'quizzes:quiz_take' quiz.pk %}" class="btn btn-primary">Retake</a>
+</div>
+{% endblock %}

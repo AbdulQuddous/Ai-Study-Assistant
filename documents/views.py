@@ -5,6 +5,8 @@ from .forms import DocumentForm
 from .models import Document
 from .services.pdf_extractor import extract_text_from_pdf
 from ai_assistant.services.summarizer import Summarizer
+from quizzes.models import Quiz
+
 
 @login_required
 def document_list(request):
@@ -66,10 +68,20 @@ def document_detail(request, pk):
         user=request.user,
     )
 
+    recent_quiz = (
+        Quiz.objects
+        .filter(user=request.user, document=document, is_active=True)
+        .order_by("-created_at")
+        .first()
+    )
+
     return render(
         request,
         "documents/document_detail.html",
-        {"document": document},
+        {
+            "document": document,
+            "recent_quiz": recent_quiz,
+        },
     )
 
 
@@ -91,6 +103,7 @@ def document_delete(request, pk):
         {"document": document},
     )
 
+
 @login_required
 def document_summarize(request, pk):
     document = get_object_or_404(
@@ -100,7 +113,6 @@ def document_summarize(request, pk):
     )
 
     if request.method == "POST":
-
         if not document.extracted_text.strip():
             return render(
                 request,

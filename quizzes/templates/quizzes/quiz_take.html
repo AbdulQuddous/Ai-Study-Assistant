@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  {% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags|default:'info' }}">{{ m }}</div>{% endfor %}{% endif %}
+  <h1 class="h3 mb-4">{{ quiz.title }}</h1>
+  <form method="post" id="quiz-form">
+    {% csrf_token %}
+    {% for question in questions %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ forloop.counter }}. {{ question.text }}</h5>
+          {% for choice in question.choices.all %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="q_{{ question.id }}"
+                     id="q{{ question.id }}_{{ choice.order }}" value="{{ choice.order }}">
+              <label class="form-check-label" for="q{{ question.id }}_{{ choice.order }}">{{ choice.text }}</label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+  </form>
+</div>
+<script>
+  document.getElementById("quiz-form").addEventListener("submit", function () {
+    document.getElementById("submit-btn").disabled = true;
+  });
+</script>
+{% endblock %}

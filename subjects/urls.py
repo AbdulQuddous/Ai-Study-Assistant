@@ -6,7 +6,7 @@ from .views import subject_detail
 from .views import subject_list
 from .views import subject_update
 
-
+app_name = "subjects"
 urlpatterns = [
 
     path(

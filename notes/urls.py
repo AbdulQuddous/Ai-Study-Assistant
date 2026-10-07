@@ -7,7 +7,7 @@ from .views import (
     note_list,
     note_update,
 )
-
+app_name = "notes"
 
 urlpatterns = [
     path("", note_list, name="note_list"),

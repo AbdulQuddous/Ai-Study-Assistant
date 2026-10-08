@@ -21,6 +21,7 @@ urlpatterns = [
     path("documents/", include("documents.urls")),
     path("quizzes/", include("quizzes.urls")),
     path("ai/", include("ai_assistant.urls")),
+    path("api/",include("quizzes.api_urls")),
 ]
 
 if settings.DEBUG:

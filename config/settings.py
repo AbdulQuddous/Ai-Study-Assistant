@@ -14,8 +14,11 @@ from pathlib import Path
 import os
 
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management.utils import get_random_secret_key
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -24,19 +27,26 @@ GEMINI_MODEL = os.getenv(
     "gemini-3.6-flash",
 )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+mjuwzg*y)bpg+ggc41)zvr1m%f9x=w+@6g^lv2kf4*wg0fms%'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in {"true", "1", "yes"}
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY is required when debug is disabled.")
+    # Development only: set a stable key in .env to retain sessions across restarts.
+    SECRET_KEY = get_random_secret_key()
+ALLOWED_HOSTS = [host.strip() for host in os.getenv(
+    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]"
+).split(",") if host.strip()]
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0"))
 
 
 # Application definition
@@ -137,6 +147,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 # Email
@@ -144,9 +156,21 @@ STATIC_URL = 'static/'
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': os.getenv("DJANGO_EMAIL_BACKEND", (
+            "django.core.mail.backends.console.EmailBackend" if DEBUG
+            else "django.core.mail.backends.smtp.EmailBackend"
+        )),
     },
 }
+if MAILERS["default"]["BACKEND"] == "django.core.mail.backends.smtp.EmailBackend":
+    MAILERS["default"]["OPTIONS"] = {
+        "host": os.getenv("DJANGO_EMAIL_HOST", "localhost"),
+        "port": int(os.getenv("DJANGO_EMAIL_PORT", "587")),
+        "username": os.getenv("DJANGO_EMAIL_USER", ""),
+        "password": os.getenv("DJANGO_EMAIL_PASSWORD", ""),
+        "use_tls": os.getenv("DJANGO_EMAIL_USE_TLS", "true").lower() in {"true", "1", "yes"},
+        "timeout": 10,
+    }
 
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
@@ -180,3 +204,9 @@ QUIZ_DEFAULT_QUESTION_COUNT = int(os.getenv("QUIZ_DEFAULT_QUESTION_COUNT", "5"))
 QUIZ_MAX_QUESTION_COUNT = int(os.getenv("QUIZ_MAX_QUESTION_COUNT", "20"))
 QUIZ_CHOICES_PER_QUESTION = 4
 QUIZ_MAX_CONTEXT_CHARS = int(os.getenv("QUIZ_MAX_CONTEXT_CHARS", "12000"))
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+}

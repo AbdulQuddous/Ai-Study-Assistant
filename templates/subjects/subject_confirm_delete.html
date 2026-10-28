@@ -1,32 +1,6 @@
 {% extends "base.html" %}
-
-{% block title %}
-Delete Subject
-{% endblock %}
-
+{% block title %}Delete subject{% endblock %}
+{% block breadcrumb %}Subjects{% endblock %}
 {% block content %}
-
-<h1>Delete Subject</h1>
-
-<p>
-    Are you sure you want to delete
-    <strong>{{ subject.name }}</strong>?
-</p>
-
-<form method="POST">
-
-    {% csrf_token %}
-
-    <button type="submit">
-        Yes, Delete
-    </button>
-
-</form>
-
-<a
-    href="{% url 'subjects:subject_detail' subject.pk %}"
->
-    Cancel
-</a>
-
+<section class="panel confirm-panel"><span class="icon-tile rose">{% include "includes/icon.html" with name="trash" %}</span><h1>Delete this subject?</h1><p>You’re about to delete <strong>{{ subject.name }}</strong>.</p><div class="alert alert-warning">Its notes, document records, conversations, quizzes, and results will also be deleted. This cannot be undone. Stored PDF files are retained separately.</div><form method="post" data-loading="Deleting…">{% csrf_token %}<div class="form-actions"><button class="btn btn-danger" type="submit">Yes, Delete</button><a class="btn" href="{% url 'subjects:subject_detail' subject.pk %}">Keep subject</a></div></form></section>
 {% endblock %}

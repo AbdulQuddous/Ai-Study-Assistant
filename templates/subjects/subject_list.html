@@ -1,63 +1,11 @@
 {% extends "base.html" %}
-
-{% block title %}
-My Subjects
-{% endblock %}
-
+{% block title %}Subjects{% endblock %}
+{% block breadcrumb %}Subjects{% endblock %}
 {% block content %}
-
-<h1>My Subjects</h1>
-
-<a href="{% url 'subjects:subject_create' %}">
-    Create Subject
-</a>
-
-<hr>
-
+<div class="page-heading"><div><p class="eyebrow">AN INDEX OF INTERESTS</p><h1>Subjects of study.</h1><p class="page-description">Give each area of your learning its own place on the shelf.</p></div><a class="btn btn-primary" href="{% url 'subjects:subject_create' %}">Create Subject {% include "includes/icon.html" with name="plus" %}</a></div>
 {% if subjects %}
-
-    {% for subject in subjects %}
-
-        <article>
-
-            <h2>
-                {{ subject.name }}
-            </h2>
-
-            <p>
-                {{ subject.description }}
-            </p>
-
-            <a
-                href="{% url 'subjects:subject_detail' subject.pk %}"
-            >
-                View
-            </a>
-
-            <a
-                href="{% url 'subjects:subject_update' subject.pk %}"
-            >
-                Edit
-            </a>
-
-            <a
-                href="{% url 'subjects:subject_delete' subject.pk %}"
-            >
-                Delete
-            </a>
-
-        </article>
-
-        <hr>
-
-    {% endfor %}
-
-{% else %}
-
-    <p>
-        You don't have any subjects yet.
-    </p>
-
-{% endif %}
-
+<div class="toolbar"><span class="result-count" id="subject-count" aria-live="polite">{{ subjects|length }} subject{{ subjects|length|pluralize }} / on the shelf</span><div class="filter-field"><label class="sr-only" for="subject-filter">Filter subjects</label><span class="search-input">{% include "includes/icon.html" with name="search" %}<input type="search" id="subject-filter" placeholder="Find a subject…" data-filter-input="subject-grid" data-filter-empty="subject-no-results" data-filter-count="subject-count"></span></div></div>
+<div class="resource-grid subject-grid" id="subject-grid">{% for subject in subjects %}<article class="resource-card subject-volume" data-filter-card><div class="card-top"><span class="subject-code">SUBJECT / {{ forloop.counter|stringformat:"02d" }}</span><a class="icon-button" href="{% url 'subjects:subject_update' subject.pk %}" aria-label="Edit {{ subject.name }}">{% include "includes/icon.html" with name="note" %}</a></div><h2><a href="{% url 'subjects:subject_detail' subject.pk %}">{{ subject.name }}</a></h2><p>{{ subject.description|default:"A place for your reading, notes, and questions on this subject."|truncatewords:24 }}</p><div class="card-bottom"><small>{{ subject.created_at|date:"d M Y" }}</small><a class="text-link" href="{% url 'subjects:subject_detail' subject.pk %}">Open subject {% include "includes/icon.html" with name="arrow" %}</a></div></article>{% endfor %}</div>
+<div class="panel" id="subject-no-results" hidden>{% include "includes/empty_state.html" with icon="search" heading="No matching subjects" description="Try another name or clear your filter." %}<div class="empty-reset"><button class="btn btn-ghost" type="button" data-clear-filter="subject-filter">Clear filter</button></div></div>
+{% else %}{% url 'subjects:subject_create' as create_url %}<section class="panel">{% include "includes/empty_state.html" with icon="book" heading="What are you studying?" description="You don't have any subjects yet. Start with a course, a topic, or a question you want to explore." action_url=create_url action_label="Create your first subject" %}</section>{% endif %}
 {% endblock %}

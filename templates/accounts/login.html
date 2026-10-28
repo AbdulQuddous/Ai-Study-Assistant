@@ -1,31 +1,8 @@
 {% extends "base.html" %}
-
-{% block title %}
-Login
-{% endblock %}
-
+{% block title %}Log in{% endblock %}
 {% block content %}
-
-<h1>Login</h1>
-
-<form method="POST">
-
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button type="submit">
-        Login
-    </button>
-
-</form>
-
-<p>
-    Don't have an account?
-
-    <a href="{% url 'register' %}">
-        Register
-    </a>
-</p>
-
+<div class="auth-grid">
+    <section class="auth-intro"><span class="auth-edition">STUDY ASSISTANT / PERSONAL EDITION</span><h1>A place for<br> what you<br> <em>learn.</em></h1><div class="auth-cover-rule"></div><p>Keep the source. Follow a question.<br> Put the idea in your own words.</p><span class="auth-cover-foot">READING · NOTES · PRACTICE <span>01—∞</span></span></section>
+    <section class="auth-panel"><p class="eyebrow">RETURN TO YOUR DESK</p><h2>Open your notebook.</h2><p>Log in to your subjects, notes, and documents.</p><form method="post" data-loading="Signing in…">{% csrf_token %}{% include "includes/form_fields.html" %}<button class="btn btn-primary btn-block" type="submit">Log in {% include "includes/icon.html" with name="arrow" %}</button></form><p class="auth-switch">First time here? <a href="{% url 'register' %}">Create an account</a></p><div class="auth-trust">{% include "includes/icon.html" with name="shield" %}Your materials stay in your account.</div></section>
+</div>
 {% endblock %}

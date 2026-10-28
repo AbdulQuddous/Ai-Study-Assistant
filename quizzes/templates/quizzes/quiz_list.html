@@ -1,15 +1,8 @@
 {% extends "base.html" %}
+{% block title %}Practice quizzes{% endblock %}
+{% block breadcrumb %}Practice quizzes{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <h1 class="h3 mb-4">My Quizzes</h1>
-  {% if quizzes %}
-    <div class="row g-3">
-      {% for quiz in quizzes %}
-        <div class="col-md-6 col-lg-4">{% include "quizzes/partials/quiz_card.html" %}</div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="alert alert-info">No quizzes yet. Open a document and click <strong>Generate Quiz</strong>.</div>
-  {% endif %}
-</div>
+<div class="page-heading"><div><p class="eyebrow">CLOSE THE BOOK. SEE WHAT STAYS.</p><h1>Practice &amp; recall.</h1><p class="page-description">Question sets drawn from your documents. Review every answer when you finish.</p></div><a class="btn btn-primary" href="{% url 'documents:document_list' %}">{% include "includes/icon.html" with name="plus" %}Create from a document</a></div>
+{% if quizzes %}<div class="toolbar"><span class="result-count" id="quiz-count" aria-live="polite">{{ quizzes|length }} active quiz{{ quizzes|length|pluralize:'zes' }}</span><div class="filter-field"><label class="sr-only" for="quiz-filter">Filter quizzes</label><span class="search-input">{% include "includes/icon.html" with name="search" %}<input type="search" id="quiz-filter" placeholder="Find a quiz…" data-filter-input="quiz-grid" data-filter-empty="quiz-no-results" data-filter-count="quiz-count"></span></div></div><div class="resource-grid" id="quiz-grid">{% for quiz in quizzes %}{% include "quizzes/partials/quiz_card.html" %}{% endfor %}</div><div class="panel" id="quiz-no-results" hidden>{% include "includes/empty_state.html" with icon="search" heading="No matching quizzes" description="Try a different title or document name." %}<div class="empty-reset"><button class="btn btn-ghost" type="button" data-clear-filter="quiz-filter">Clear filter</button></div></div>
+{% else %}{% url 'documents:document_list' as docs_url %}<section class="panel">{% include "includes/empty_state.html" with icon="quiz" heading="Put your reading to the test" description="No quizzes yet. Open a document and click Generate Quiz to create your first set of questions." action_url=docs_url action_label="Explore my documents" %}</section>{% endif %}
 {% endblock %}

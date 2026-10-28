@@ -1,27 +1,7 @@
 {% extends "base.html" %}
-
-{% block title %}
-{{ title }}
-{% endblock %}
-
+{% block title %}{{ title }}{% endblock %}
+{% block breadcrumb %}Subjects{% endblock %}
 {% block content %}
-
-<h1>{{ title }}</h1>
-
-<form method="POST">
-
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button type="submit">
-        Save Subject
-    </button>
-
-</form>
-
-<a href="{% url 'subjects:subject_list' %}">
-    Cancel
-</a>
-
+<a class="back-link" href="{% url 'subjects:subject_list' %}">{% include "includes/icon.html" with name="arrow" %}Back to subjects</a><div class="page-heading"><div><p class="eyebrow">SUBJECT FILE</p><h1>{{ title }}</h1><p class="page-description">Add the name of a course, topic, or area of study.</p></div></div>
+<div class="form-layout"><section class="panel form-panel"><form method="post" data-loading="Saving subject…">{% csrf_token %}{% include "includes/form_fields.html" %}<div class="form-actions"><button class="btn btn-primary" type="submit">{% include "includes/icon.html" with name="check" %}Save Subject</button><a class="btn btn-ghost" href="{% url 'subjects:subject_list' %}">Cancel</a></div></form></section><aside class="form-aside"><span class="icon-tile teal">{% include "includes/icon.html" with name="book" %}</span><h2>Organize by subject.</h2><p>Use a course, a topic, or something you’ve always wanted to understand.</p><p>Try “Data structures”, “Biology”, or “A little bit of astronomy”. Add notes and PDFs to it as you go.</p></aside></div>
 {% endblock %}

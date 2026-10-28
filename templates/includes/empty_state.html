@@ -1,0 +1,1 @@
+<div class="empty-state"><span class="empty-icon">{% include "includes/icon.html" with name=icon|default:"book" %}</span><h3>{{ heading }}</h3><p>{{ description }}</p>{% if action_url %}<a href="{{ action_url }}" class="btn btn-primary">{% include "includes/icon.html" with name="plus" %}{{ action_label }}</a>{% endif %}</div>

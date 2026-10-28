@@ -1,66 +1,52 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        {% block title %}
-        AI Study Assistant
-        {% endblock %}
-    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f1eee5">
+    <title>{% block title %}AI Study Assistant{% endblock %} · Study Assistant</title>
+    <script>document.documentElement.classList.add('js');try{if(localStorage.getItem('study-theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}</script>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    <script src="{% static 'js/app.js' %}" defer></script>
 </head>
-
-<body>
-
-<header>
-    <nav>
-        <a href="/">AI Study Assistant</a>
-
-        {% if user.is_authenticated %}
-
-        <a href="{% url 'dashboard' %}">
-            Dashboard
-        </a>
-
-        <a href="{% url 'profile' %}">
-            Profile
-        </a>
-
-        <form
-            method="POST"
-            action="{% url 'logout' %}"
-            style="display:inline;"
-        >
-            {% csrf_token %}
-
-            <button type="submit">
-                Logout
-            </button>
-        </form>
-
-    {% else %}
-
-        <a href="{% url 'login' %}">
-            Login
-        </a>
-
-        <a href="{% url 'register' %}">
-            Register
-        </a>
-
-    {% endif %}
-    </nav>
-</header>
-
-<main>
-
-    {% block content %}
-    {% endblock %}
-
+<body class="{% if user.is_authenticated %}workspace{% else %}auth-layout{% endif %}">
+{% include "includes/icons.html" %}
+<a class="skip-link" href="#main-content">Skip to content</a>
+{% if user.is_authenticated %}
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+        <div class="sidebar-inner">
+            <div class="drawer-brand">{% include "includes/brand.html" %}</div>
+            <button class="icon-button sidebar-close" type="button" data-sidebar-close aria-label="Close navigation">{% include "includes/icon.html" with name="close" %}</button>
+            {% with route=request.resolver_match.url_name app=request.resolver_match.app_name %}
+            <nav class="side-nav" aria-label="Study tools">
+                <a href="{% url 'dashboard' %}" {% if route == 'dashboard' %}class="active" aria-current="page"{% endif %}><span class="nav-number">01</span>The desk</a>
+                <a href="{% url 'subjects:subject_list' %}" {% if app == 'subjects' %}class="active" aria-current="page"{% endif %}><span class="nav-number">02</span>Subjects</a>
+                <a href="{% url 'notes:note_list' %}" {% if app == 'notes' %}class="active" aria-current="page"{% endif %}><span class="nav-number">03</span>Notes</a>
+                <a href="{% url 'documents:document_list' %}" {% if app == 'documents' or app == 'ai_assistant' %}class="active" aria-current="page"{% endif %}><span class="nav-number">04</span>Library</a>
+                <a href="{% url 'quizzes:quiz_list' %}" {% if app == 'quizzes' %}class="active" aria-current="page"{% endif %}><span class="nav-number">05</span>Practice</a>
+            </nav>
+            {% endwith %}
+            <a class="nav-new-note" href="{% url 'notes:note_create' %}">{% include "includes/icon.html" with name="note" %}A new note</a>
+            <div class="sidebar-bottom"><a class="profile-link" href="{% url 'profile' %}"><span class="avatar">{{ user.username|first|upper }}</span><span><strong>{{ user.username }}</strong><small>My account</small></span></a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout-button" type="submit">{% include "includes/icon.html" with name="exit" %}Log out</button></form></div>
+        </div>
+    </aside>
+    <button class="sidebar-backdrop" data-close-sidebar aria-label="Close navigation" tabindex="-1" hidden></button>
+    <div class="workspace-body">
+        <header class="topbar">
+            <div class="topbar-location"><button class="icon-button mobile-menu" type="button" data-menu-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">{% include "includes/icon.html" with name="menu" %}</button>{% include "includes/brand.html" %}</div>
+            <div class="topbar-actions"><span class="today">{% now "d F Y" %}</span><button class="icon-button" type="button" data-theme-toggle aria-label="Switch to dark theme" title="Change theme">{% include "includes/icon.html" with name="moon" class="theme-moon" %}{% include "includes/icon.html" with name="sun" class="theme-sun" %}</button><a class="account-link" href="{% url 'profile' %}" aria-label="My profile"><span class="avatar avatar-small">{{ user.username|first|upper }}</span><span>{{ user.username }}</span></a></div>
+        </header>
+{% else %}
+    <header class="auth-header">{% include "includes/brand.html" %}<div class="auth-header-right"><span class="today">Read. Question. Remember.</span><button class="icon-button" type="button" data-theme-toggle aria-label="Switch to dark theme">{% include "includes/icon.html" with name="moon" class="theme-moon" %}{% include "includes/icon.html" with name="sun" class="theme-sun" %}</button></div></header>
+{% endif %}
+<main id="main-content" tabindex="-1" class="main-content {% block main_class %}{% endblock %}">
+    {% if user.is_authenticated %}<div class="page-location">STUDY ASSISTANT <span>/</span> {% block breadcrumb %}The desk{% endblock %}</div>{% endif %}
+    {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} notification" role="status"><span>{{ message }}</span><button type="button" class="icon-button" data-dismiss-message aria-label="Dismiss notification">{% include "includes/icon.html" with name="close" %}</button></div>{% endfor %}
+    {% block content %}{% endblock %}
+    <footer class="page-footer"><span>Study Assistant <span class="footer-slash">/</span> Your personal learning journal</span><span>Read closely. Think for yourself.</span></footer>
 </main>
-
+{% if user.is_authenticated %}</div>{% endif %}
+<div class="toast" id="ui-toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

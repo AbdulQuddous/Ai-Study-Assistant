@@ -1,26 +1,7 @@
 {% extends "base.html" %}
-
-{% block title %}
-Profile
-{% endblock %}
-
+{% block title %}My profile{% endblock %}
+{% block breadcrumb %}My account{% endblock %}
 {% block content %}
-
-<h1>My Profile</h1>
-
-<p>
-    <strong>Username:</strong>
-    {{ user.username }}
-</p>
-
-<p>
-    <strong>Email:</strong>
-    {{ user.email }}
-</p>
-
-<p>
-    <strong>Joined:</strong>
-    {{ user.date_joined }}
-</p>
-
+<div class="page-heading"><div><p class="eyebrow">JOURNAL OWNER</p><h1>My profile</h1><p class="page-description">Your account information.</p></div></div>
+<section class="panel reading-panel" style="max-width:740px"><div class="profile-hero"><span class="avatar">{{ user.username|first|upper }}</span><div><h2>{{ user.username }}</h2><span class="subject-badge">Student workspace</span></div></div><dl class="content-meta"><div><dt>Username</dt><dd>{{ user.username }}</dd></div><div><dt>Email</dt><dd>{{ user.email|default:"No email added" }}</dd></div><div><dt>Joined</dt><dd>{{ user.date_joined|date:"F j, Y" }}</dd></div></dl><hr><div class="actions"><a class="btn btn-primary" href="{% url 'dashboard' %}">Back to my learning {% include "includes/icon.html" with name="arrow" %}</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-ghost" type="submit">Log out</button></form></div></section>
 {% endblock %}

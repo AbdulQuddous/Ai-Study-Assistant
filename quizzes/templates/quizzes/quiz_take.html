@@ -1,30 +1,10 @@
 {% extends "base.html" %}
+{% block title %}Practice · {{ quiz.title }}{% endblock %}
+{% block breadcrumb %}Quiz in progress{% endblock %}
+{% block main_class %}quiz-page{% endblock %}
 {% block content %}
-<div class="container py-4">
-  {% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags|default:'info' }}">{{ m }}</div>{% endfor %}{% endif %}
-  <h1 class="h3 mb-4">{{ quiz.title }}</h1>
-  <form method="post" id="quiz-form">
-    {% csrf_token %}
-    {% for question in questions %}
-      <div class="card mb-3">
-        <div class="card-body">
-          <h5 class="card-title">{{ forloop.counter }}. {{ question.text }}</h5>
-          {% for choice in question.choices.all %}
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="q_{{ question.id }}"
-                     id="q{{ question.id }}_{{ choice.order }}" value="{{ choice.order }}">
-              <label class="form-check-label" for="q{{ question.id }}_{{ choice.order }}">{{ choice.text }}</label>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
-  </form>
-</div>
-<script>
-  document.getElementById("quiz-form").addEventListener("submit", function () {
-    document.getElementById("submit-btn").disabled = true;
-  });
-</script>
+<a class="back-link" href="{% url 'quizzes:quiz_detail' quiz.pk %}">{% include "includes/icon.html" with name="arrow" %}Back to quiz details</a><div class="page-heading"><div><p class="eyebrow">PRACTICE IN PROGRESS</p><h1>{{ quiz.title }}</h1><p class="page-description">Choose one answer for each question. You can change it before submitting.</p></div></div>
+<div class="quiz-progress-panel"><div class="quiz-progress-heading"><strong>Your progress</strong><span data-answered-count aria-live="polite">0 of {{ questions|length }} answered</span></div><progress id="quiz-progress" value="0" max="{{ questions|length }}" aria-label="Questions answered"></progress><nav class="question-nav" aria-label="Jump to a question">{% for question in questions %}<a href="#question-{{ question.id }}" data-question-link="question-{{ question.id }}" aria-label="Question {{ forloop.counter }}: not answered">{{ forloop.counter }}</a>{% endfor %}</nav></div>
+<form method="post" id="quiz-form" data-loading="Checking your answers…">{% csrf_token %}{% for question in questions %}<fieldset class="panel question-card" id="question-{{ question.id }}" data-question="{{ forloop.counter }}"><legend><span class="eyebrow">QUESTION {{ forloop.counter }} OF {{ questions|length }}</span>{{ question.text }}</legend><div class="choice-list">{% for choice in question.choices.all %}<label class="choice-label" for="q{{ question.id }}_{{ choice.order }}"><input type="radio" name="q_{{ question.id }}" id="q{{ question.id }}_{{ choice.order }}" value="{{ choice.order }}"><span class="choice-letter" aria-hidden="true">{% cycle 'A' 'B' 'C' 'D' %}</span><span>{{ choice.text }}</span></label>{% endfor %}</div></fieldset>{% endfor %}<div class="panel quiz-submit-bar"><div><strong>Ready to see how you did?</strong><p>Your answers are saved when you submit.</p></div><button class="btn btn-primary" type="submit" id="submit-btn">Submit quiz {% include "includes/icon.html" with name="check" %}</button></div></form>
+<dialog class="quiz-review-dialog" id="quiz-review-dialog" aria-labelledby="review-dialog-title"><h2 id="review-dialog-title">A few questions are still open.</h2><p data-unanswered-message></p><div class="actions"><button class="btn btn-primary" type="button" data-continue-quiz>Keep answering</button><button class="btn" type="button" data-confirm-submit>Submit anyway</button></div></dialog>
 {% endblock %}

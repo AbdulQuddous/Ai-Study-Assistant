@@ -1,51 +1,6 @@
 {% extends "base.html" %}
-
+{% block title %}Delete note{% endblock %}
+{% block breadcrumb %}My notes{% endblock %}
 {% block content %}
-
-<div class="container mt-4">
-
-    <div class="card">
-
-        <div class="card-body">
-
-            <h2>Delete Note</h2>
-
-            <p>
-                Are you sure you want to delete:
-            </p>
-
-            <h4>
-                "{{ note.title }}"
-            </h4>
-
-            <p class="text-danger">
-                This action cannot be undone.
-            </p>
-
-            <form method="post">
-
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="btn btn-danger"
-                >
-                    Yes, Delete
-                </button>
-
-                <a
-                    href="{% url 'note_detail' note.pk %}"
-                    class="btn btn-secondary"
-                >
-                    Cancel
-                </a>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</div>
-
+<section class="panel confirm-panel"><span class="icon-tile rose">{% include "includes/icon.html" with name="trash" %}</span><h1>Delete this note?</h1><p>You’re about to delete <strong>{{ note.title }}</strong>.</p><p>This action cannot be undone. If you’d like to keep a copy, go back and copy your note first.</p><form method="post" data-loading="Deleting…">{% csrf_token %}<div class="form-actions"><button class="btn btn-danger" type="submit">Yes, Delete</button><a class="btn" href="{% url 'notes:note_detail' note.pk %}">Keep note</a></div></form></section>
 {% endblock %}

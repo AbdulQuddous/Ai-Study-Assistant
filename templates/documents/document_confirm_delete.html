@@ -1,52 +1,6 @@
 {% extends "base.html" %}
-
+{% block title %}Delete document{% endblock %}
+{% block breadcrumb %}Documents{% endblock %}
 {% block content %}
-
-<div class="container mt-4">
-
-    <div class="card">
-
-        <div class="card-header">
-            <h3>Delete Document</h3>
-        </div>
-
-        <div class="card-body">
-
-            <p>
-                Are you sure you want to delete
-                <strong>{{ document.title }}</strong>?
-            </p>
-
-            <p class="text-danger">
-                This will permanently delete the uploaded PDF
-                and its extracted text.
-            </p>
-
-
-            <form method="post">
-
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="btn btn-danger"
-                >
-                    Yes, Delete
-                </button>
-
-                <a
-                    href="{% url 'documents:document_detail' document.pk %}"
-                    class="btn btn-secondary"
-                >
-                    Cancel
-                </a>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</div>
-
+<section class="panel confirm-panel"><span class="icon-tile rose">{% include "includes/icon.html" with name="trash" %}</span><h1>Delete this document?</h1><p>You’re about to delete <strong>{{ document.title }}</strong>.</p><div class="alert alert-warning">The document record, extracted text, conversations, quizzes, and results will be deleted. This cannot be undone. Stored PDF files are retained separately.</div><form method="post" data-loading="Deleting…">{% csrf_token %}<div class="form-actions"><button class="btn btn-danger" type="submit">Yes, Delete</button><a class="btn" href="{% url 'documents:document_detail' document.pk %}">Keep document</a></div></form></section>
 {% endblock %}

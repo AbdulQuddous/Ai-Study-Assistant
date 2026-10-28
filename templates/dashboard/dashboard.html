@@ -1,45 +1,35 @@
 {% extends "base.html" %}
-
-{% block title %}
-Dashboard
-{% endblock %}
-
+{% block title %}The desk{% endblock %}
+{% block breadcrumb %}The desk{% endblock %}
 {% block content %}
-
-<h1>
-    AI Study Assistant
-</h1>
-
-<h2>
-    Welcome, {{ user.username }}!
-</h2>
-
-<hr>
-
-<h3>
-    Study Tools
-</h3>
-
-<ul>
-
-    <li>
-        <a href="{% url 'subjects:subject_list' %}">
-            My Subjects
-        </a>
-    </li>
-
-    <li>
-        <a href="{% url 'documents:document_list' %}">
-            My Documents
-        </a>
-    </li>
-
-    <li>
-        <a href="{% url 'quizzes:quiz_list' %}">
-            AI Quizzes
-        </a>
-    </li>
-
-</ul>
-
+<header class="desk-heading">
+    <div><p class="eyebrow">A SPACE TO THINK</p><h1>Back to the desk,<br><em>{{ user.username }}.</em></h1></div>
+    <div class="desk-heading-aside"><p>Your reading, your questions,<br>your growing body of knowledge.</p><div class="actions"><a href="{% url 'documents:document_upload' %}" class="btn btn-primary">Add a document {% include "includes/icon.html" with name="plus" %}</a><a href="{% url 'notes:note_create' %}" class="text-link">Write a note {% include "includes/icon.html" with name="arrow" %}</a></div></div>
+</header>
+<div class="collection-ledger" aria-label="Your study totals">
+    <a href="{% url 'subjects:subject_list' %}"><span>Subjects</span><strong>{{ subject_count|stringformat:"02d" }}</strong></a>
+    <a href="{% url 'documents:document_list' %}"><span>Documents</span><strong>{{ document_count|stringformat:"02d" }}</strong></a>
+    <a href="{% url 'notes:note_list' %}"><span>Notes</span><strong>{{ note_count|stringformat:"02d" }}</strong></a>
+    <a href="{% url 'quizzes:quiz_list' %}"><span>Active quizzes</span><strong>{{ quiz_count|stringformat:"02d" }}</strong></a>
+    <div><span>Quiz attempts</span><strong>{{ attempt_count|stringformat:"02d" }}</strong></div>
+</div>
+<div class="desk-columns">
+    <section class="reading-section">
+        <div class="section-heading"><div><span class="section-number">01 / THE READING PILE</span><h2>Recent documents</h2></div><a class="text-link" href="{% url 'documents:document_list' %}">Full library {% include "includes/icon.html" with name="arrow" %}</a></div>
+        <div class="reading-pile">{% for document in recent_documents %}{% if forloop.first %}
+            <article class="reading-feature">
+                <a class="folio-cover" href="{% url 'documents:document_detail' document.pk %}" aria-label="Read {{ document.title }}"><span class="folio-top">STUDY MATERIAL <span>PDF</span></span><strong>{{ document.title }}</strong><span class="folio-bottom">YOUR PERSONAL LIBRARY <span>↗</span></span></a>
+                <div class="reading-feature-copy"><span class="eyebrow">LAST ADDED TO THE LIBRARY</span><h3>{{ document.title }}</h3><p>Start with the source.<br>Follow the questions it raises.</p><a class="btn btn-primary" href="{% url 'documents:document_detail' document.pk %}">Open document {% include "includes/icon.html" with name="arrow" %}</a><a class="text-link secondary-reading-link" href="{% url 'ai_assistant:document_qa' document.pk %}">Ask about this document</a></div>
+            </article>
+        {% else %}<a class="archive-row" href="{% url 'documents:document_detail' document.pk %}"><span class="archive-number">{{ forloop.counter|stringformat:"02d" }}</span><strong>{{ document.title }}</strong><span class="archive-format">PDF</span>{% include "includes/icon.html" with name="arrow" %}</a>{% endif %}{% empty %}{% url 'documents:document_upload' as upload_url %}{% include "includes/empty_state.html" with icon="file" heading="No documents yet" description="Add a PDF to begin. You can read it, ask questions, and make a practice quiz." action_url=upload_url action_label="Add a document" %}{% endfor %}</div>
+    </section>
+    <section class="working-notes">
+        <div class="section-heading"><div><span class="section-number">02 / IN THE MARGIN</span><h2>Recent notes</h2></div><a class="text-link" href="{% url 'notes:note_create' %}" aria-label="Write a new note">{% include "includes/icon.html" with name="plus" %}</a></div>
+        {% for note in recent_notes %}<a class="margin-note" href="{% url 'notes:note_detail' note.pk %}"><span class="margin-note-number">NOTE {{ forloop.counter|stringformat:"02d" }}</span><h3>{{ note.title }}</h3><span class="margin-note-bottom">Continue reading {% include "includes/icon.html" with name="arrow" %}</span></a>{% empty %}{% url 'notes:note_create' as note_url %}{% include "includes/empty_state.html" with icon="note" heading="No notes yet" description="Write down an explanation, an example, or a question you want to return to." action_url=note_url action_label="Write a note" %}{% endfor %}
+    </section>
+</div>
+<div class="practice-columns">
+    <section><div class="section-heading"><div><span class="section-number">03 / RECALL &amp; REPEAT</span><h2>Recent quizzes</h2></div><a class="text-link" href="{% url 'quizzes:quiz_list' %}">All practice {% include "includes/icon.html" with name="arrow" %}</a></div>{% for quiz in recent_quizzes %}<a class="practice-row" href="{% url 'quizzes:quiz_detail' quiz.pk %}"><span class="practice-index">{{ forloop.counter|stringformat:"02d" }}</span><span><strong>{{ quiz.title }}</strong><small>{{ quiz.question_count }} questions</small></span>{% include "includes/icon.html" with name="arrow" %}</a>{% empty %}{% include "includes/empty_state.html" with icon="quiz" heading="No active quizzes yet" description="Open a document to generate your first practice set." %}{% endfor %}</section>
+    <section><div class="section-heading"><div><span class="section-number">04 / THE RECORD</span><h2>Recent results</h2></div></div>{% for attempt in recent_attempts %}<a class="result-ledger-row" href="{% url 'quizzes:quiz_result' attempt.pk %}"><span class="ledger-result">{{ attempt.percentage }}%</span><span class="ledger-result-title"><strong>{{ attempt.quiz.title }}</strong><small>{{ attempt.score }}/{{ attempt.total_questions }} correct · {{ attempt.created_at|date:"M j" }}</small></span>{% include "includes/icon.html" with name="arrow" %}</a>{% empty %}{% include "includes/empty_state.html" with icon="award" heading="No quiz attempts yet" description="Your results will appear here after you take a quiz." %}{% endfor %}</section>
+</div>
 {% endblock %}

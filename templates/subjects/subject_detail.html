@@ -1,47 +1,7 @@
 {% extends "base.html" %}
-
-{% block title %}
-{{ subject.name }}
-{% endblock %}
-
+{% block title %}{{ subject.name }}{% endblock %}
+{% block breadcrumb %}Subjects{% endblock %}
 {% block content %}
-
-<h1>
-    {{ subject.name }}
-</h1>
-
-<p>
-    {{ subject.description }}
-</p>
-
-<p>
-    Created:
-    {{ subject.created_at }}
-</p>
-
-<p>
-    Updated:
-    {{ subject.updated_at }}
-</p>
-
-<hr>
-
-<a
-    href="{% url 'subjects:subject_update' subject.pk %}"
->
-    Edit
-</a>
-
-<a
-    href="{% url 'subjects:subject_delete' subject.pk %}"
->
-    Delete
-</a>
-
-<a
-    href="{% url 'subjects:subject_list' %}"
->
-    Back to Subjects
-</a>
-
+<a class="back-link" href="{% url 'subjects:subject_list' %}">{% include "includes/icon.html" with name="arrow" %}Back to Subjects</a><div class="page-heading"><div><p class="eyebrow">SUBJECT FILE</p><h1>{{ subject.name }}</h1><p class="page-description">Reading and notes for this area of study.</p></div><a class="btn" href="{% url 'subjects:subject_update' subject.pk %}">{% include "includes/icon.html" with name="note" %}Edit subject</a></div>
+<div class="content-layout"><section class="panel reading-panel"><h2>About this subject</h2><div class="prose">{% if subject.description %}{{ subject.description|linebreaks }}{% else %}<p class="text-muted">No description yet. Add a few words about what you’d like to learn.</p>{% endif %}</div><hr><dl class="content-meta"><div><dt>Created</dt><dd>{{ subject.created_at|date:"M j, Y" }}</dd></div><div><dt>Last updated</dt><dd>{{ subject.updated_at|date:"M j, Y" }}</dd></div></dl></section><aside><h2>Keep learning</h2><div class="study-actions"><a class="study-action" href="{% url 'notes:note_create' %}"><span class="icon-tile amber">{% include "includes/icon.html" with name="note" %}</span><span><strong>Write a note</strong><small>Capture an idea while it’s fresh.</small></span></a><a class="study-action" href="{% url 'documents:document_upload' %}"><span class="icon-tile blue">{% include "includes/icon.html" with name="upload" %}</span><span><strong>Upload a PDF</strong><small>Add source material to your library.</small></span></a></div><div class="danger-zone"><a class="danger-link" href="{% url 'subjects:subject_delete' subject.pk %}">{% include "includes/icon.html" with name="trash" %}Delete subject</a></div></aside></div>
 {% endblock %}

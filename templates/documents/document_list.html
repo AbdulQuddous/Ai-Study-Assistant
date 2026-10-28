@@ -1,96 +1,17 @@
 {% extends "base.html" %}
-
+{% block title %}Library{% endblock %}
+{% block breadcrumb %}Library{% endblock %}
 {% block content %}
-
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h1>My Documents</h1>
-
-        <a
-            href="{% url 'documents:document_upload' %}"
-            class="btn btn-primary"
-        >
-            + Upload PDF
-        </a>
-
-    </div>
-
-
-    {% if documents %}
-
-        <div class="row">
-
-            {% for document in documents %}
-
-                <div class="col-md-6 mb-4">
-
-                    <div class="card h-100">
-
-                        <div class="card-body">
-
-                            <h5 class="card-title">
-                                {{ document.title }}
-                            </h5>
-
-                            <p class="text-muted">
-                                Subject:
-                                {{ document.subject.name }}
-                            </p>
-
-                            <p>
-                                Extracted text:
-                                {{ document.extracted_text|wordcount }}
-                                words
-                            </p>
-
-                            <a
-                                href="{% url 'documents:document_detail' document.pk %}"
-                                class="btn btn-primary"
-                            >
-                                View
-                            </a>
-
-                            <a
-                                href="{{ document.file.url }}"
-                                target="_blank"
-                                class="btn btn-outline-secondary"
-                            >
-                                Open PDF
-                            </a>
-
-                        </div>
-
-                        <div class="card-footer text-muted">
-
-                            Uploaded:
-                            {{ document.created_at|date:"M d, Y H:i" }}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-    {% else %}
-
-        <div class="alert alert-info">
-
-            You haven't uploaded any PDFs yet.
-
-            <a href="{% url 'documents:document_upload' %}">
-                Upload your first PDF.
-            </a>
-
-        </div>
-
-    {% endif %}
-
-</div>
-
+<div class="page-heading"><div><p class="eyebrow">THE SOURCE MATERIAL</p><h1>Your library.</h1><p class="page-description">Keep the papers, chapters, and lectures you want to come back to.</p></div><a class="btn btn-primary" href="{% url 'documents:document_upload' %}">Add a document {% include "includes/icon.html" with name="plus" %}</a></div>
+{% if documents %}
+<div class="toolbar"><span class="result-count" id="document-count" aria-live="polite">{{ documents|length }} document{{ documents|length|pluralize }} / in the collection</span><div class="filter-field"><label class="sr-only" for="document-filter">Filter documents</label><span class="search-input">{% include "includes/icon.html" with name="search" %}<input type="search" id="document-filter" placeholder="Find a title or subject…" data-filter-input="document-grid" data-filter-empty="document-no-results" data-filter-count="document-count"></span></div></div>
+<div class="document-index" id="document-grid">{% for document in documents %}
+    <article class="document-file" data-filter-card>
+        <span class="file-icon">{% include "includes/icon.html" with name="file" %}<small>PDF</small></span>
+        <div><span class="subject-badge">{{ document.subject.name }}</span><h2><a href="{% url 'documents:document_detail' document.pk %}">{{ document.title }}</a></h2><p>{{ document.extracted_text|truncatewords:20|default:"Open this document to read your study material." }}</p></div>
+        <div class="document-file-aside"><small>{{ document.created_at|date:"d M Y" }} · {{ document.extracted_text|wordcount }} words</small><div class="document-file-actions"><a class="text-link" href="{% url 'documents:document_detail' document.pk %}">Read {% include "includes/icon.html" with name="arrow" %}</a><a class="icon-button" href="{% url 'documents:document_file' document.pk %}" target="_blank" rel="noopener" aria-label="Open PDF: {{ document.title }} (new tab)">{% include "includes/icon.html" with name="file" %}</a></div></div>
+    </article>
+{% endfor %}</div>
+<div class="panel" id="document-no-results" hidden>{% include "includes/empty_state.html" with icon="search" heading="No matching documents" description="Try another title or subject name." %}<div class="empty-reset"><button class="btn btn-ghost" type="button" data-clear-filter="document-filter">Clear filter</button></div></div>
+{% else %}{% url 'documents:document_upload' as upload_url %}<section class="panel">{% include "includes/empty_state.html" with icon="file" heading="Start your collection" description="You haven't uploaded any PDFs yet. Add a chapter, a paper, or a set of lecture notes." action_url=upload_url action_label="Add your first document" %}</section>{% endif %}
 {% endblock %}

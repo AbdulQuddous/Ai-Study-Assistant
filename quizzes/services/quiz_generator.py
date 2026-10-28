@@ -48,7 +48,7 @@ def validate_quiz_payload(data, num_questions):
             fail(f"question {i}: text must be a non-empty string")
         if not isinstance(q.get("explanation"), str):
             fail(f"question {i}: explanation must be a string")
-        if q.get("difficulty") not in DIFFICULTIES:
+        if not isinstance(q.get("difficulty"), str) or q["difficulty"] not in DIFFICULTIES:
             fail(f"question {i}: difficulty must be easy, medium or hard")
         choices = q.get("choices")
         if (
@@ -65,6 +65,12 @@ def validate_quiz_payload(data, num_questions):
         idx = q.get("correct_choice_index")
         if isinstance(idx, bool) or not isinstance(idx, int) or not 0 <= idx <= 3:
             fail(f"question {i}: correct_choice_index must be an int 0-3")
+        sources = q.get("source_chunk_ids", [])
+        if not isinstance(sources, list) or any(
+            isinstance(value, bool) or not isinstance(value, int) or value <= 0
+            for value in sources
+        ):
+            fail(f"question {i}: source_chunk_ids must contain positive integer IDs")
 
 
 def extract_json(text):
@@ -116,10 +122,13 @@ class QuizGenerator:
             ]
 
         per_chunk_cap = max(1, settings.QUIZ_MAX_CONTEXT_CHARS // desired)
-        texts = [
-            str(getattr(c, CHUNK_TEXT_FIELD))[:per_chunk_cap]
-            for c in selected
-        ]
+        self._context_chunk_ids = {
+            c.pk for c in selected if getattr(c, "pk", None) is not None
+        }
+        texts = []
+        for chunk in selected:
+            label = f"[Chunk ID: {chunk.pk}]\n" if getattr(chunk, "pk", None) else ""
+            texts.append((label + str(getattr(chunk, CHUNK_TEXT_FIELD)))[:per_chunk_cap])
         return CHUNK_SEPARATOR.join(texts)
 
     def _call_llm(self, prompt):
@@ -150,12 +159,8 @@ class QuizGenerator:
                 last_raw = self._call_llm(to_send)
             except Exception as exc:  # noqa: BLE001
                 # Provider exception types are unknown; wrapped and re-raised.
-                logger.warning(
-                    "LLM call failed (attempt %s): %s", attempt + 1, exc
-                )
-                last_error = QuizGenerationError(
-                    f"LLM call failed: {exc}"
-                )
+                logger.warning("LLM call failed (attempt %s).", attempt + 1)
+                last_error = QuizGenerationError("LLM call failed.")
                 continue
             try:
                 data = extract_json(last_raw)
@@ -164,6 +169,11 @@ class QuizGenerator:
                 ):
                     data["questions"] = data["questions"][:num_questions]
                 validate_quiz_payload(data, num_questions)
+                for question in data["questions"]:
+                    sources = question.get("source_chunk_ids", [])
+                    allowed = self._context_chunk_ids
+                    if allowed and (not sources or not set(sources).issubset(allowed)):
+                        raise QuizGenerationError("Question sources must reference supplied chunks.")
                 return data
             except QuizGenerationError as exc:
                 logger.warning(
@@ -173,6 +183,4 @@ class QuizGenerator:
                 )
                 last_error = exc
 
-        raise QuizGenerationError(
-            f"{last_error} | raw response: {last_raw[:500]}"
-        )
+        raise QuizGenerationError("Unable to generate a valid quiz.") from last_error

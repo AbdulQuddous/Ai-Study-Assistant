@@ -19,6 +19,16 @@ class QuizPersister:
         questions = quiz_data.get("questions") if isinstance(quiz_data, dict) else None
         if not questions or not isinstance(questions, list):
             raise QuizPersistenceError("No questions to save.")
+        if document.user_id != user.pk:
+            raise QuizPersistenceError("Document does not belong to this user.")
+        allowed_sources = set(document.chunks.values_list("id", flat=True))
+        for question in questions:
+            sources = question.get("source_chunk_ids", []) if isinstance(question, dict) else None
+            if not isinstance(sources, list) or any(
+                isinstance(value, bool) or not isinstance(value, int)
+                or value not in allowed_sources for value in sources
+            ):
+                raise QuizPersistenceError("Invalid document source reference.")
 
         try:
             with transaction.atomic():
@@ -41,7 +51,7 @@ class QuizPersister:
                         explanation=q.get("explanation", ""),
                         correct_choice_index=q["correct_choice_index"],
                         difficulty=q.get("difficulty", ""),
-                        source_chunk_ids=[],
+                        source_chunk_ids=list(dict.fromkeys(q.get("source_chunk_ids", []))),
                     )
                     for c_order, text in enumerate(q["choices"]):
                         Choice.objects.create(question=question, order=c_order, text=text)

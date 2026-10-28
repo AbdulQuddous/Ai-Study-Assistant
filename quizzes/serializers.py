@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
 from .models import Choice, Question, Quiz, QuizAttempt
-
+class QuizAttemptSubmissionSerializer(serializers.Serializer):
+    answers = serializers.DictField(
+        child=serializers.IntegerField(),
+        allow_empty=False,
+    )
 
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +26,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             "id",
             "order",
             "text",
-            "explanation",
             "difficulty",
             "choices",
         ]

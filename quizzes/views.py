@@ -28,8 +28,8 @@ def quiz_generate(request, pk):
         quiz = QuizPersister().save(
             document, request.user, quiz_data, model_used=generator.model_used
         )
-    except QuizError as exc:
-        logger.warning("Quiz generation failed for document %s: %s", pk, exc)
+    except (QuizError, ValueError):
+        logger.warning("Quiz generation failed for document %s.", pk)
         messages.error(request, "Could not generate quiz. Please try again.")
         return redirect("documents:document_detail", pk=document.pk)
     messages.success(request, "Quiz generated.")
@@ -100,8 +100,13 @@ def quiz_result(request, pk):
         QuizAttempt.objects.select_related("quiz"), pk=pk, user=request.user
     )
     by_id = {a["question_id"]: a for a in attempt.answers}
+    questions = list(attempt.quiz.questions.prefetch_related("choices"))
+    source_ids = {pk for question in questions for pk in question.source_chunk_ids}
+    sources = {
+        chunk.pk: chunk for chunk in attempt.quiz.document.chunks.filter(pk__in=source_ids)
+    } if source_ids else {}
     review = []
-    for question in attempt.quiz.questions.prefetch_related("choices"):
+    for question in questions:
         ans = by_id.get(question.id, {})
         chosen = ans.get("chosen_index", -1)
         review.append(
@@ -109,6 +114,7 @@ def quiz_result(request, pk):
                 "question": question,
                 "chosen_index": chosen,
                 "is_correct": ans.get("is_correct", False),
+                "source_chunks": [sources[pk] for pk in question.source_chunk_ids if pk in sources],
                 "choices": [
                     {
                         "text": c.text,

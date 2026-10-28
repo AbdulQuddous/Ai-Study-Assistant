@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .api_views import (
+    QuizAttemptAPIView,
     QuizDetailAPIView,
     QuizListAPIView,
 )
@@ -17,5 +18,10 @@ urlpatterns = [
         "quizzes/<int:pk>/",
         QuizDetailAPIView.as_view(),
         name="quiz-detail",
+    ),
+    path(
+        "quizzes/<int:pk>/attempt/",
+        QuizAttemptAPIView.as_view(),
+        name="quiz-attempt",
     ),
 ]

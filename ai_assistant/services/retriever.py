@@ -69,21 +69,4 @@ class DocumentRetriever:
             reverse=True,
         )
 
-        if not results:
-            # Fallback: return top-k of everything if nothing passed
-            all_results = []
-            for chunk in chunks:
-                similarity = cosine_similarity(
-                    query_embedding,
-                    chunk.embedding,
-                )
-                all_results.append(
-                    {"chunk": chunk, "score": similarity}
-                )
-            all_results.sort(
-                key=lambda item: item["score"],
-                reverse=True,
-            )
-            return all_results[:top_k]
-
         return results[:top_k]

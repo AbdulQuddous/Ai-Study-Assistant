@@ -1,19 +1,21 @@
 from functools import lru_cache
 
 from django.conf import settings
-from sentence_transformers import SentenceTransformer
 
 
 @lru_cache(maxsize=1)
 def get_embedding_model():
+    from sentence_transformers import SentenceTransformer
+
     return SentenceTransformer(
         settings.EMBEDDING_MODEL
     )
 
 
 class EmbeddingService:
-    def __init__(self):
-        self.model = get_embedding_model()
+    @property
+    def model(self):
+        return get_embedding_model()
 
     def embed_text(self, text):
         if not text or not text.strip():

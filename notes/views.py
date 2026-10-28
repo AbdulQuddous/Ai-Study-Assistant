@@ -77,7 +77,7 @@ def note_create(request):
 
             note.save()
 
-            return redirect("note_list")
+            return redirect("notes:note_list")
 
     else:
 
@@ -116,7 +116,7 @@ def note_update(request, pk):
             form.save()
 
             return redirect(
-                "note_detail",
+                "notes:note_detail",
                 pk=note.pk
             )
 
@@ -147,7 +147,7 @@ def note_delete(request, pk):
     if request.method == "POST":
         note.delete()
 
-        return redirect("note_list")
+        return redirect("notes:note_list")
 
     return render(
         request,

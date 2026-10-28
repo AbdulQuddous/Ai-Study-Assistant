@@ -7,6 +7,7 @@ from ai_assistant.services.rag import RAGService
 from documents.models import Document, DocumentChunk, Subject
 
 
+@override_settings(GEMINI_API_KEY="test-key")
 class RAGServiceConfigTests(TestCase):
     """
     Verify that RAGService reads top_k and similarity_threshold from

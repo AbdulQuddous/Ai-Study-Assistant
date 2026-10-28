@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from .services.processor import process_document
 from .forms import DocumentForm
@@ -37,15 +38,15 @@ def document_upload(request):
             document = form.save(commit=False)
             document.user = request.user
 
-            document.extracted_text = extract_text_from_pdf(
-                document.file
-            )
-
-            document.save()
-
-            process_document(document)
-
-            return redirect("document_list")
+            try:
+                document.extracted_text = extract_text_from_pdf(document.file)
+                process_document(document)
+            except ValueError:
+                form.add_error(None, "Unable to process this PDF. Use an unencrypted PDF with selectable text and try again.")
+            except Exception:
+                form.add_error(None, "Unable to process this PDF right now. Please try again.")
+            else:
+                return redirect("documents:document_list")
 
     else:
         form = DocumentForm(user=request.user)
@@ -68,11 +69,10 @@ def document_detail(request, pk):
         user=request.user,
     )
 
-    recent_quiz = (
+    quizzes = (
         Quiz.objects
         .filter(user=request.user, document=document, is_active=True)
         .order_by("-created_at")
-        .first()
     )
 
     return render(
@@ -80,7 +80,7 @@ def document_detail(request, pk):
         "documents/document_detail.html",
         {
             "document": document,
-            "recent_quiz": recent_quiz,
+            "document_quizzes": quizzes,
         },
     )
 
@@ -95,7 +95,7 @@ def document_delete(request, pk):
 
     if request.method == "POST":
         document.delete()
-        return redirect("document_list")
+        return redirect("documents:document_list")
 
     return render(
         request,
@@ -126,12 +126,13 @@ def document_summarize(request, pk):
                 },
             )
 
-        summarizer = Summarizer()
-
         try:
+            summarizer = Summarizer()
             summary = summarizer.summarize(
                 document.extracted_text
             )
+            if not isinstance(summary, str) or not summary.strip():
+                raise ValueError("AI returned an empty summary.")
 
             document.ai_summary = summary
 
@@ -156,6 +157,17 @@ def document_summarize(request, pk):
             )
 
     return redirect(
-        "document_detail",
+        "documents:document_detail",
         pk=document.pk,
     )
+
+
+@login_required
+def document_file(request, pk):
+    document = get_object_or_404(Document, pk=pk, user=request.user)
+    try:
+        response = FileResponse(document.file.open("rb"), content_type="application/pdf")
+    except (FileNotFoundError, ValueError):
+        raise Http404("PDF file is unavailable.")
+    response["Cache-Control"] = "private, no-store"
+    return response

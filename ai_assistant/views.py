@@ -26,9 +26,8 @@ def document_qa(request, document_id):
         if form.is_valid():
             question = form.cleaned_data["question"]
 
-            rag_service = RAGService()
-
             try:
+                rag_service = RAGService()
                 result = rag_service.answer(
                     document=document,
                     question=question,
@@ -45,11 +44,7 @@ def document_qa(request, document_id):
                     sources=sources,
                 )
 
-            except Exception as e:
-                print(
-                    f"[VIEW] RAG error: "
-                    f"{type(e).__name__}: {e}"
-                )
+            except Exception:
                 error = (
                     "Unable to answer the question right now. "
                     "Please try again."

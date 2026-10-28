@@ -6,11 +6,13 @@ from .views import (
     document_list,
     document_summarize,
     document_upload,
+    document_file,
 )
 app_name = "documents" 
 
 urlpatterns = [
     path("", document_list, name="document_list"),
+    path("<int:pk>/file/", document_file, name="document_file"),
 
     path(
         "upload/",

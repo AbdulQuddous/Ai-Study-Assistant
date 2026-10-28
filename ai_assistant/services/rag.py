@@ -7,7 +7,6 @@ from ..prompts.rag import build_rag_prompt
 
 class RAGService:
     def __init__(self):
-        self.llm = LLMService()
         self.retriever = DocumentRetriever()
 
     def answer(
@@ -69,10 +68,6 @@ class RAGService:
         best_score = retrieved_chunks[0]["score"]
 
         if best_score < min_confidence:
-            print(
-                f"[RAG] Low confidence: best_score={best_score:.3f} "
-                f"< min_confidence={min_confidence:.3f}"
-            )
             return {
                 "answer": (
                     "I could not find sufficiently relevant "
@@ -86,7 +81,9 @@ class RAGService:
             retrieved_chunks=retrieved_chunks,
         )
 
-        answer = self.llm.generate(prompt)
+        answer = LLMService().generate(prompt)
+        if not isinstance(answer, str) or not answer.strip():
+            raise RuntimeError("AI service returned an empty answer.")
 
         sources = [
             {

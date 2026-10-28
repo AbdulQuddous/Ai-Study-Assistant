@@ -3,7 +3,10 @@ import re
 
 
 def extract_text_from_pdf(file):
+    file.seek(0)
     reader = PdfReader(file)
+    if reader.is_encrypted:
+        raise ValueError("Encrypted PDFs are not supported. Upload an unencrypted PDF.")
     extracted_pages = []
 
     for page in reader.pages:
@@ -23,4 +26,7 @@ def extract_text_from_pdf(file):
     # 3. Collapse runs of spaces
     raw = re.sub(r"[ \t]+", " ", raw)
 
-    return raw.strip()
+    text = raw.strip()
+    if not text:
+        raise ValueError("No text could be extracted. Upload a PDF with selectable text.")
+    return text

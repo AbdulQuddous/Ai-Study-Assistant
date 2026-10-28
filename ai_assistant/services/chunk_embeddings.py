@@ -1,6 +1,7 @@
 from documents.models import DocumentChunk
 
 from .embeddings import EmbeddingService
+from .similarity import validate_embedding_batch
 
 
 class ChunkEmbeddingService:
@@ -16,6 +17,7 @@ class ChunkEmbeddingService:
         embedding = self.embedding_service.embed_text(
             chunk.content
         )
+        validate_embedding_batch([embedding], 1)
 
         chunk.embedding = embedding
         chunk.save(
@@ -40,6 +42,7 @@ class ChunkEmbeddingService:
         embeddings = self.embedding_service.embed_texts(
             texts
         )
+        validate_embedding_batch(embeddings, len(texts))
 
         for chunk, embedding in zip(
             chunks,

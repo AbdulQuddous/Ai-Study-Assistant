@@ -43,7 +43,7 @@ def subject_create(request):
             subject.save()
 
             return redirect(
-                "subject_list"
+                "subjects:subject_list"
             )
 
     else:
@@ -99,7 +99,7 @@ def subject_update(request, pk):
             form.save()
 
             return redirect(
-                "subject_detail",
+                "subjects:subject_detail",
                 pk=subject.pk
             )
 
@@ -133,7 +133,7 @@ def subject_delete(request, pk):
         subject.delete()
 
         return redirect(
-            "subject_list"
+            "subjects:subject_list"
         )
 
     return render(

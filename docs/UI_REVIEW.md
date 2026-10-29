@@ -34,6 +34,10 @@ services, permissions, model/provider choices and data are preserved. No package
   Processing shows an honest pending state without a fabricated percentage.
 - **AI conversations:** optional question suggestions, a character counter, answer cards,
   expandable source excerpts, copy actions and a reminder to verify important information.
+- **AI readability:** summaries and answers render Markdown headings, lists, emphasis and code
+  with readable spacing. Space entities such as `&#x20;` are decoded. The shared formatter uses
+  the existing `markdown-it-py` dependency with HTML, links and images disabled. Stored text,
+  user questions and PDF excerpts remain unchanged; saved AI content needs no regeneration.
 - **Practice quizzes:** larger selectable choices, live answered counts, progress and question
   shortcuts; an optional unanswered-question review before submission; clear result states,
   explanations and source excerpts. Scoring remains on the server.
@@ -48,10 +52,11 @@ history, and forms keep their existing CSRF tokens and ownership-protected endpo
 
 | Check | Observed result |
 | --- | --- |
-| Full Django suite after template refresh | **137 passed in 64.538 seconds** |
+| Full Django suite after AI readability fix | **151 passed in 63.680 seconds** |
+| Focused formatting, configuration and document tests after registration fix | **36 passed**, including 15 formatting tests covering entities, Python syntax, HTML escaping, saved-content rendering and missing auto-discovery |
 | Intermediate focused regression suite | 73 ran; one percentage-markup assertion failed and was corrected in the template; tests were retained |
 | Dashboard after correction | **4 passed**, including percentages, query bound and ownership |
-| Chromium browser checks | **102 assertions passed**, no browser console errors |
+| Chromium browser checks | **109 assertions passed**, no browser console errors; includes rendered summary/answer formatting and copy-target text |
 | Desktop rendering | 17 pages rendered through the actual Django views using synthetic fixtures |
 | Responsive layouts | No horizontal overflow on checked 390px screens; additional checks at 320px |
 | Interactions | Theme persistence, list filtering/clearing, question suggestions/counter, source expansion, password visibility, word counts, file feedback, quiz progress/confirmation/loading, browser-history recovery, drawer buttons/Tab/Escape |
@@ -123,4 +128,6 @@ PYTHONDONTWRITEBYTECODE=1 venv/bin/python scripts/check_ui_browser.py \
 ```
 
 For ordinary local use, run `venv/bin/python manage.py runserver` and sign in normally.
+Restart an existing server after adding the formatter package; it is explicitly registered
+in template settings, but an older process must reload those settings before using it.
 Production still requires the previously documented hosting/static/media configuration.

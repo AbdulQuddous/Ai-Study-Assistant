@@ -1,5 +1,5 @@
 {
-  "passed": 102,
+  "passed": 109,
   "checks": [
     "dashboard: script loaded",
     "desktop layout has no overflow",
@@ -42,9 +42,16 @@
     "filter empty state appears",
     "clearing filter restores cards",
     "qa: script loaded",
+    "AI answers display emphasis instead of Markdown markers",
+    "AI answers display readable bullet lists",
+    "AI answer copy target has no space entity artifacts",
     "question suggestion fills textarea",
     "question character count updates",
     "source excerpt expands",
+    "document: script loaded",
+    "AI summary displays section headings",
+    "AI summary displays numbered and bullet lists",
+    "AI summary copy target has no formatting artifacts",
     "login: script loaded",
     "password visibility toggle works",
     "note-form: script loaded",

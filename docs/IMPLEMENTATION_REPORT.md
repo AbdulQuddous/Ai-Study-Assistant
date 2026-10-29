@@ -196,3 +196,37 @@ The final full suite passed **137 tests in 64.538 seconds**. Browser checks pass
 with no console errors. The focused run initially caught a percentage string split across
 markup; the template was corrected and the existing assertions were kept. The final screenshots
 and design details are in [UI_REVIEW.md](UI_REVIEW.md).
+
+### AI summary and answer readability
+
+Generated summaries and chat answers were being displayed with `linebreaks`, leaving Markdown
+markers such as `**` and `###` visible. A shared `study_markdown` template filter now renders
+headings, lists, emphasis and code, decodes space entities such as `&#x20;`, and escapes embedded
+HTML. Python syntax such as `*args`, `**kwargs` and exponentiation remains intact inside code.
+Scoped reading styles improve spacing and code blocks. Existing saved content benefits immediately
+without regeneration or rewriting records. Questions and PDF excerpts keep their existing display.
+
+Files changed include `ai_assistant/templatetags/study_formatting.py`, both AI reading templates,
+`static/css/site.css`, formatting regression tests, browser fixtures/checks and preview artifacts.
+The existing `markdown-it-py` dependency is reused; no dependency, schema or provider change was
+needed. No live AI calls or working-database changes were made.
+
+The focused formatting suite passed **14 tests** and the full suite passed **151 tests in
+63.680 seconds**. Chromium checks passed **109 assertions** with no console errors; the Django
+system check passed. Updated synthetic previews and verification details are in
+[UI_REVIEW.md](UI_REVIEW.md). This follow-up is uncommitted.
+
+### Template-library registration follow-up
+
+The user's running development server reported `study_formatting` as an unregistered library
+after the new package was added. Fresh test processes discovered it, but the existing server
+retained its earlier registry. `config/settings.py` now explicitly registers the formatter in
+`TEMPLATES[0].OPTIONS.libraries`. An existing server must restart once to load the updated settings;
+refreshing the browser alone is insufficient.
+
+A regression test simulates discovery omitting the new library. It reproduced the exact
+`TemplateSyntaxError` before the settings change and now renders the filter and compiles both
+affected templates successfully. `manage.py test ai_assistant.test_formatting config.tests
+documents.tests` passed **36 tests in 0.724 seconds**; `manage.py check` found no issues.
+The earlier 151-test full-suite result and 109 browser checks predate this registration follow-up.
+No live Gemini call was made; the logged provider 503 is separate from this template failure.

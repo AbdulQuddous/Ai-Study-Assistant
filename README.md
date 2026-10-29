@@ -80,6 +80,7 @@ The current processing service uses **500-character chunks and 100-character ove
 - Generate summaries from extracted document text.
 - Use Google Gemini for language generation.
 - Save summaries with documents for later viewing.
+- Read summaries and chat answers with formatted headings, lists, emphasis and code; HTML space entities are decoded. Existing saved content displays correctly without regeneration.
 - Handle AI service errors through the application service layer.
 
 ### Document Question Answering with RAG
@@ -435,6 +436,12 @@ python manage.py migrate
 
 Review generated migrations before applying schema changes, particularly if the database already contains important data.
 
+After adding a template-tag module, restart the development server once (Ctrl+C, then
+`venv/bin/python manage.py runserver`). A browser refresh does not rebuild an already running
+server's template-library registry. The AI formatter is explicitly registered in `TEMPLATES`
+under `OPTIONS.libraries`; if an older process reports that `study_formatting` is not registered,
+restart it to load the updated settings. See [Django's template-tag documentation](https://docs.djangoproject.com/en/4.1/howto/custom-template-tags/).
+
 ## Running Tests
 
 Run the full test suite:
@@ -455,7 +462,7 @@ You can also run tests for an individual app, for example:
 python manage.py test quizzes
 ```
 
-The pre-change baseline passed **61 tests** using the cached embedding model with `HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1`. After the journal-design revision, the full suite passed **137 tests in 64.538 seconds** on 2026-10-28. Ordinary tests mock external model/API work and do not require API keys or network downloads. See [the implementation report](docs/IMPLEMENTATION_REPORT.md) for commands and verification limits.
+The pre-change baseline passed **61 tests** using the cached embedding model with `HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1`. After the AI readability fix, the full suite passed **151 tests in 63.680 seconds** on 2026-10-28. Ordinary tests mock external model/API work and do not require API keys or network downloads. See [the implementation report](docs/IMPLEMENTATION_REPORT.md) for commands and verification limits.
 
 ```bash
 python manage.py makemigrations --check --dry-run

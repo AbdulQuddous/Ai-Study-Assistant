@@ -89,6 +89,10 @@ TEMPLATES = [
         "DIRS": [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
+            # Register explicitly so rendering does not depend on app tag discovery.
+            'libraries': {
+                'study_formatting': 'ai_assistant.templatetags.study_formatting',
+            },
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',

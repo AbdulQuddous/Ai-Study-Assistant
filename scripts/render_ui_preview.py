@@ -59,10 +59,10 @@ notes = [
 ]
 for title, subject, content in notes:
     Note.objects.create(user=user, subject=subject, title=title, content=content)
-summary = ('The big idea\nPlants transform light into chemical energy through photosynthesis.\n\n'
-           'Two stages, working together\n1. Light-dependent reactions capture energy in ATP and NADPH.\n2. The Calvin cycle uses that energy to turn carbon dioxide into sugars.\n\n'
-           'What to remember\nChlorophyll absorbs the light. Water and carbon dioxide go in; glucose and oxygen come out. '
-           'Light, temperature, and carbon dioxide availability can influence the rate.')
+summary = ('### The big idea\nPlants transform **light** into chemical energy through photosynthesis.&#x20;\n\n'
+           '### Two stages, working together\n1. **Light-dependent reactions** capture energy in ATP and NADPH.\n2. **The Calvin cycle** uses that energy to turn carbon dioxide into sugars.\n\n'
+           '### What to remember\n* Chlorophyll absorbs the light.\n* Water and carbon dioxide go in; glucose and oxygen come out.\n'
+           '* Light, temperature, and carbon dioxide availability can influence the rate.')
 documents[0].ai_summary = summary
 documents[0].save()
 quiz = None
@@ -83,7 +83,7 @@ for index, doc in enumerate(documents[:3]):
         answers = [{'question_id': q.pk, 'chosen_index': q.correct_choice_index, 'correct_index': q.correct_choice_index, 'is_correct': True} for q in saved.questions.all()]
         attempt = QuizAttempt.objects.create(user=user, quiz=saved, score=3, total_questions=3, answers=answers)
         ChatMessage.objects.create(user=user, document=doc, question='How do the two stages of photosynthesis work together?',
-            answer='Think of it as capture, then build.\n\nThe light-dependent reactions capture energy from sunlight and store it in ATP and NADPH. The Calvin cycle uses that energy to turn carbon dioxide into sugars.\n\nThe first stage supplies the energy; the second stage uses it to make food for the plant.',
+            answer='Think of it as **capture, then build**.&#x20;\n\n* **Capture:** Light-dependent reactions store energy from sunlight in ATP and NADPH.\n* **Build:** The Calvin cycle uses that energy to turn carbon dioxide into sugars.\n\nThe first stage supplies the energy; the second stage uses it to make food for the plant.',
             sources=[{'chunk_id': chunk.pk, 'chunk_index': 0, 'score': .87, 'content': chunk.content}])
     else:
         QuizAttempt.objects.create(user=user, quiz=saved, score=2, total_questions=3)

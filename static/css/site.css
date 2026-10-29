@@ -273,6 +273,22 @@ textarea[name=content] { font-family: var(--serif); font-size: 1.1rem; line-heig
 .reading-panel { padding: 36px; border-top: 2px solid var(--ink); }
 .prose { font-family: var(--serif); font-size: 1.1rem; line-height: 1.95; overflow-wrap: anywhere; }
 .prose p:last-child { margin-bottom: 0; }
+.ai-prose > :first-child { margin-top: 0; }
+.ai-prose :is(h3,h4,h5,h6) { margin: 1.7em 0 .65em; font-family: var(--serif); font-weight: 600; line-height: 1.4; letter-spacing: -.02em; }
+.ai-prose h3 { font-size: 1.35rem; }
+.ai-prose :is(h4,h5,h6) { font-size: 1.15rem; }
+.ai-prose p { margin-bottom: 1em; }
+.ai-prose :is(ul,ol) { padding-left: 1.5em; margin: .6em 0 1.3em; }
+.ai-prose li { padding-left: .25em; margin-bottom: .55em; }
+.ai-prose li::marker { color: var(--primary); }
+.ai-prose li > p { margin-bottom: .4em; }
+.ai-prose li > :is(ul,ol) { margin-top: .4em; margin-bottom: .6em; }
+.ai-prose strong { font-weight: 700; }
+.ai-prose code { font-family: var(--mono); font-size: .78em; padding: .15em .35em; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 2px; overflow-wrap: anywhere; }
+.ai-prose pre { max-width: 100%; overflow-x: auto; padding: 18px 20px; margin: 1.2em 0; border: 1px solid var(--line); background: var(--bg); line-height: 1.7; }
+.ai-prose pre code { padding: 0; border: 0; background: transparent; overflow-wrap: normal; white-space: pre; }
+.ai-prose blockquote { border-left: 2px solid var(--primary); padding-left: 20px; margin: 1.2em 0; color: var(--muted); }
+.ai-prose hr { margin: 1.5em 0; }
 .content-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
 .content-meta dt { font: .6rem var(--mono); color: var(--muted); text-transform: uppercase; }
 .content-meta dd { font-size: .8rem; margin: 8px 0 0; overflow-wrap: anywhere; }
